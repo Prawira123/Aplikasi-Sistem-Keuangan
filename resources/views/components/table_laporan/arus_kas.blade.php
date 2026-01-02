@@ -20,7 +20,7 @@
     <table class="table table-striped" id="table1">
         <thead>
             <tr>
-                <th colspan="3"><h6>SaldoAwal</h6></th>
+                <th colspan="3"><h6>Saldo Awal</h6></th>
             </tr>
             <tr>
                 <th>Akun</th>

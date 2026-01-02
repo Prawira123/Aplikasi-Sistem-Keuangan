@@ -76,7 +76,11 @@ class KaryawanController extends Controller
 
         $karyawan->update($validator);
 
-        $this->update_total_gaji($karyawan->id);
+        $gaji_karyawan = GajiKaryawan::where('karyawan_id', $karyawan->id)->first();
+        
+        if($gaji_karyawan && $gaji_karyawan->kehadiran > 0){
+            $this->update_total_gaji($karyawan->id);  
+        }
 
         return redirect()->route('karyawans.index')->with('success', 'Employee updated successfully');
     }

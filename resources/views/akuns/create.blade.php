@@ -83,8 +83,8 @@
                                         <select class="form-select" id="lawan_post_select" name="lawan_post">
                                             <option value="" seelcted disabled>Pilih Akun</option>
                                             <option value="">Tidak ada</option>
-                                            @foreach ($akuns as $akun)  
-                                                <option value="{{ $akun->id }}">{{ $akun->nama }}</option>                                               
+                                            @foreach ($lawan_posts as $lawan_post)  
+                                                <option value="{{ $lawan_post->id }}">{{ $lawan_post->nama }}</option>                                               
                                             @endforeach
                                         </select>
                                     </fieldset>

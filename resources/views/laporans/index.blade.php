@@ -34,7 +34,7 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-10" id="title">
-                    Data Laporan
+                    Data Laporan 
                 </h5>
                 <form action="{{ route('laporans.index') }}" method="GET" class="mb-4">
                     <div class="col-md-12">
@@ -48,9 +48,9 @@
                                 <option value="buku_besar">Buku Besar</option>
                                 <option value="jurnal_umum">Jurnal Umum</option>
                                 <option value="perubahan_modal">Perubahan Modal</option>
-                                <option value="transaksi_masuk">Transaksi Masuk</option>
-                                <option value="transaksi_keluar">Transaksi keluar</option>
-                                <option value="laporan_stock">Laporan Stock</option>
+                                <option value="laporan_pembelian">Laporan Penjualan</option>
+                                <option value="laporan_penjualan">Laporan Pembelian</option>
+                                <option value="laporan_stok">Laporan Stok</option>
                             </select>
                         </fieldset>
                     </div>
@@ -145,33 +145,33 @@
                         <x-table_laporan.perubahan_modal :datas="$datas" :perubahanModal="$perubahanModal ?? null" :route="'laporans.export.perubahan_modal'" :route_excel="'laporans.export.excel.perubahan_modal'" ></x-table_laporan.perubahan_modal>
                     </div>
                 @endif
-                @if (request('laporan') == 'transaksi_masuk')
+                @if (request('laporan') == 'laporan_penjualan')
                     @php
                         if (is_array($datas)) {
                             extract($datas);
                         }
                     @endphp
-                    <div class="card {{ request('laporan') == 'transaksi_masuk' ? '' : 'd-none' }}" id="transaksi_masuk">
+                    <div class="card {{ request('laporan') == 'laporan_penjualan' ? '' : 'd-none' }}" id="transaksi_masuk">
                         <x-table_laporan.transaksi_masuk :datas="$datas" :transaksiMasuk="$transaksiMasuk ?? null" :route="'laporans.export.transaksi_masuk'" :route_excel="'laporans.export.excel.transaksi_masuk'"></x-table_laporan.transaksi_masuk>
                     </div>
                 @endif
-                @if (request('laporan') == 'transaksi_keluar')
+                @if (request('laporan') == 'laporan_pembelian')
                     @php
                         if (is_array($datas)) {
                             extract($datas);
                         }
                     @endphp
-                    <div class="card {{ request('laporan') == 'transaksi_keluar' ? '' : 'd-none' }}" id="transaksi_keluar">
+                    <div class="card {{ request('laporan') == 'laporan_pembelian' ? '' : 'd-none' }}" id="transaksi_keluar">
                         <x-table_laporan.transaksi_keluar :datas="$datas" :transaksiKeluar="$transaksiKeluar ?? null" :route="'laporans.export.transaksi_keluar'" :route_excel="'laporans.export.excel.transaksi_keluar'"></x-table_laporan.transaksi_keluar>
                     </div>
                 @endif
-                @if (request('laporan') == 'laporan_stock')
+                @if (request('laporan') == 'laporan_stok')
                     @php
                         if (is_array($datas)) {
                             extract($datas);
                         }
                     @endphp
-                    <div class="card {{ request('laporan') == 'laporan_stock' ? '' : 'd-none' }}" id="laporan_stock">
+                    <div class="card {{ request('laporan') == 'laporan_stok' ? '' : 'd-none' }}" id="laporan_stock">
                         <x-table_laporan.laporan_stock :datas="$datas" :laporanStock="$laporanStock ?? null" :route="'laporans.export.stock'" :route_excel="'laporans.export.excel.laporan_stock'"></x-table_laporan.laporan_stock>
                     </div>
                 @endif

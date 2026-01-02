@@ -49,7 +49,6 @@
                         <div class="card-header">
                             <h4 class="card-title">Perbarui Akun</h4>
                         </div>
-
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12">                                                                         
@@ -85,10 +84,10 @@
                                     @endif
                                     <fieldset class="form-group">
                                         <select class="form-select" id="lawan_post_select" name="lawan_post">
-                                            <option value="" seelcted disabled>Pilih Akun</option>
+                                            <option value="" selected disabled>Pilih Akun</option>
                                             <option value="">Tidak ada</option>
-                                            @foreach ($akuns as $akun)  
-                                                <option value="{{ $akun->id }}" @if(old('lawan_post', $akun->lawan_post) == $akun->id) selected @endif>{{ $akun->nama }}</option>                                               
+                                            @foreach ($lawan_posts as $lawan_post)  
+                                                <option value="{{ $lawan_post->id }}" @if(old('lawan_post', $akun->lawan_post) == $lawan_post->id) selected @endif>{{ $lawan_post->nama }}</option>                                               
                                             @endforeach
                                         </select>
                                     </fieldset>

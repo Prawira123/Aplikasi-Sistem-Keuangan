@@ -23,7 +23,7 @@
                 <th>No</th>
                 <th>Tanggal</th>
                 <th>Kode</th>
-                <th>Aset Tetap</th>
+                <th>Akun</th>
                 <th>Saldo</th>
             </tr>
         </thead>
@@ -54,7 +54,7 @@
                 <th>No</th>
                 <th>Tanggal</th>
                 <th>Kode</th>
-                <th>Aset Lancar</th>
+                <th>Akun</th>
                 <th>Saldo</th>
             </tr>
         </thead>

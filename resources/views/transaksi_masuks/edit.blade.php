@@ -117,43 +117,38 @@
                                         </div>
                                         @enderror
                                     </div>
-                                    @if($transaksi_masuk->tipe == 'Barang')
-                                        <div class="col_barang form_barang">
-                                            <h6>Barang</h6>
-                                            <fieldset class="form-group">
-                                                <select class="form-select" id="barang" name="product_id">
-                                                    <option value="" selected disabled>Pilih barang</option>
-                                                    @foreach ($products as $product)
-                                                        <option value="{{ $product->id }}" data-harga="{{ $product->harga }}" @if(old('product_id', $transaksi_masuk->product->id) == $product->id) selected @endif>{{ $product->nama }}</option>                                             
-                                                    @endforeach
-                                                </select>
-                                            </fieldset>
-                                            @error('product_id')
-                                            <div class="text-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                            @enderror
+                                    <div class="col_barang form_barang">
+                                        <h6>Barang</h6>
+                                        <fieldset class="form-group">
+                                            <select class="form-select" id="barang" name="product_id">
+                                                <option value="" selected disabled>Pilih barang</option>
+                                                @foreach ($products as $product)
+                                                    <option value="{{ $product->id }}" data-harga="{{ $product->harga }}" @if(old('product_id', $transaksi_masuk->product->id) == $product->id) selected @endif>{{ $product->nama }}</option>                                             
+                                                @endforeach
+                                            </select>
+                                        </fieldset>
+                                        @error('product_id')
+                                        <div class="text-danger mt-2">
+                                            {{ $message }}
                                         </div>
-                                    @endif
-                                    @if($transaksi_masuk->tipe == 'Jasa')
-                                        <div class="col-md-12 form_jasa">
-                                            <h6>Jasa</h6>
-                                            <fieldset class="form-group">
-                                                <select class="form-select" id="jasa" name="jasa_id">
-                                                    <option value="" selected disabled>Pilih Jasa</option>
-                                                    @foreach ($jasas as $jasa)
-                                                        <option value="{{ $jasa->id }}" data-harga="{{ $jasa->harga }}" @if(old('jasa_id', $transaksi_masuk->jasa->id) == $jasa->id) selected @endif >{{ $jasa->nama }}</option>                                             
-                                                    @endforeach
-                                                </select>
-                                            </fieldset>
-                                            @error('jasa_id')
-                                            <div class="text-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                            @enderror
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-12 form_jasa">
+                                        <h6>Jasa</h6>
+                                        <fieldset class="form-group">
+                                            <select class="form-select" id="jasa" name="jasa_id">
+                                                <option value="" selected disabled>Pilih Jasa</option>
+                                                @foreach ($jasas as $jasa)
+                                                    <option value="{{ $jasa->id }}" data-harga="{{ $jasa->harga }}" @if(old('jasa_id', $transaksi_masuk->jasa->id) == $jasa->id) selected @endif >{{ $jasa->nama }}</option>                                             
+                                                @endforeach
+                                            </select>
+                                        </fieldset>
+                                        @error('jasa_id')
+                                        <div class="text-danger mt-2">
+                                            {{ $message }}
                                         </div>
-                                    @endif
-                                    @if($transaksi_masuk->tipe == 'Paket')
+                                        @enderror
+                                    </div>
                                     <div class="col-md-12 form_paket">
                                         <h6>Paket</h6>
                                         <fieldset class="form-group">
@@ -170,27 +165,24 @@
                                         </div>
                                         @enderror
                                     </div>
-                                    @endif
-                                    @if($transaksi_masuk->tipe == 'Barang')
-                                        <div class="form_barang">
-                                            <label for="helperText"><h6>Quantity</h6></label>
-                                            <input type="number" id="qty" class="form-control" name="qty" value="{{ old('qty', $transaksi_masuk->qty) }}">
-                                            @error('qty')
-                                            <div class="text-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                            @enderror
+                                    <div class="form_barang">
+                                        <label for="helperText"><h6>Quantity</h6></label>
+                                        <input type="number" id="qty" class="form-control" name="qty" value="{{ old('qty', $transaksi_masuk->qty) }}">
+                                        @error('qty')
+                                        <div class="text-danger mt-2">
+                                            {{ $message }}
                                         </div>
-                                        <div class="form_barang" >
-                                            <label for="helperText"><h6>Harga Satuan</h6></label>
-                                            <input type="number" class="form-control" id="harga_product" name="harga_satuan" value="{{ old('harga_satuan', $transaksi_masuk->harga_satuan) }}" readonly>
-                                            @error('harga_satuan')
-                                            <div class="text-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                            @enderror
+                                        @enderror
+                                    </div>
+                                    <div class="form_barang" >
+                                        <label for="helperText"><h6>Harga Satuan</h6></label>
+                                        <input type="number" class="form-control" id="harga_product" name="harga_satuan" value="{{ old('harga_satuan', $transaksi_masuk->harga_satuan) }}" readonly>
+                                        @error('harga_satuan')
+                                        <div class="text-danger mt-2">
+                                            {{ $message }}
                                         </div>
-                                    @endif
+                                        @enderror
+                                    </div>
                                     <div class="form-group">
                                         <label for="helperText"><h6>Harga Total</h6></label>
                                         <input type="number" id="harga_total" class="form-control" name="harga_total" value="{{ old('harga_total', $transaksi_masuk->harga_total) }}" readonly>
@@ -260,75 +252,106 @@
 
 <script>
 
-    const form_barang = document.querySelectorAll('.form_barang');
-    const form_jasa = document.querySelector('.form_jasa');
-    const form_paket = document.querySelector('.form_paket');
-    const barang = document.querySelector('#barang');
-    const hargaInput = document.querySelector('#harga_product');
-    const qtyInput = document.querySelector('#qty');
-    const hargaTotal = document.querySelector('#harga_total');
-    const jasa = document.querySelector('#jasa');
-    const paket = document.querySelector('#paket');
+   const form_barang = document.querySelectorAll('.form_barang');
+const form_jasa = document.querySelector('.form_jasa');
+const form_paket = document.querySelector('.form_paket');
+const barang = document.querySelector('#barang');
+const hargaInput = document.querySelector('#harga_product');
+const qtyInput = document.querySelector('#qty');
+const hargaTotal = document.querySelector('#harga_total');
+const jasa = document.querySelector('#jasa');
+const paket = document.querySelector('#paket');
+const tipeSelect = document.querySelector('#tipe');
 
-    // form_barang.forEach(el => {
-    //     el.classList.add('d-none');
-    // });
-    // form_jasa.classList.add('d-none');
+function toggleFormByTipe(tipe) {
+    // hide all
+    form_barang.forEach(el => el.classList.add('d-none'));
+    if (form_jasa) form_jasa.classList.add('d-none');
+    if (form_paket) form_paket.classList.add('d-none');
 
+    // show by tipe
+    if (tipe === 'Barang') {
+        form_barang.forEach(el => el.classList.remove('d-none'));
+    } else if (tipe === 'Jasa') {
+        if (form_jasa) form_jasa.classList.remove('d-none');
+    } else if (tipe === 'Paket') {
+        if (form_paket) form_paket.classList.remove('d-none');
+    }
+}
 
-    // document.querySelector('#tipe').addEventListener('change', function() {
-        
-    //     let tipe = this.value;
+// 🔹 saat halaman pertama kali load (EDIT MODE)
+document.addEventListener('DOMContentLoaded', function () {
+    if (tipeSelect) {
+        toggleFormByTipe(tipeSelect.value);
+    }
+});
 
-    //     if (tipe == 'Barang') {
-    //         form_barang.forEach(el => {
-    //             el.classList.remove('d-none')
-    //         });
-    //         form_jasa.classList.add('d-none');
-    //     } else if(tipe == 'Jasa') {
-    //         form_jasa.classList.remove('d-none');
-    //         form_barang.forEach(el => {
-    //             el.classList.add('d-none')
-    //         });
-    //     }
+// 🔹 saat user mengganti tipe
+tipeSelect.addEventListener('change', function () {
+    toggleFormByTipe(this.value);
+});
 
-    // });
+document.querySelector('#tipe').addEventListener('change', function() {
+    
+    let tipe = this.value;
 
-   if (barang) {
-        barang.addEventListener('change', function () {
-            let harga = this.options[this.selectedIndex].getAttribute('data-harga');
-            hargaInput.value = harga;
-            hitungTotal();
+    if (tipe == 'Barang') {
+        form_barang.forEach(el => {
+            el.classList.remove('d-none')
         });
-    }
-
-    if (jasa) {
-        jasa.addEventListener('change', function () {
-            let harga = this.options[this.selectedIndex].getAttribute('data-harga');
-            let hargaJasa = parseInt(harga) || 0;
-            hargaTotal.value = hargaJasa;
+        form_jasa.classList.add('d-none');
+        form_paket.classList.add('d-none');
+    } else if(tipe == 'Jasa') {
+        form_jasa.classList.remove('d-none');
+        form_barang.forEach(el => {
+            el.classList.add('d-none')
         });
-    }
-
-    if(paket){
-        paket.addEventListener('change', function () {
-            let harga = this.options[this.selectedIndex].getAttribute('data-harga');
-            let hargaPaket = parseInt(harga) || 0;
-            hargaTotal.value = hargaPaket;
+        form_paket.classList.add('d-none');
+    }else if(tipe == 'Paket') {
+        form_paket.classList.remove('d-none');
+        form_barang.forEach(el => {
+            el.classList.add('d-none')
         });
+        form_jasa.classList.add('d-none');
     }
 
-    if (qtyInput) {
-        qtyInput.addEventListener('input', function () {
-            hitungTotal();
-        });
-    }
+});
 
-    function hitungTotal() {
-        let harga = parseInt(hargaInput.value) || 0;
-        let qty = parseInt(qtyInput.value) || 0;
-        hargaTotal.value = harga * qty;
-    }
+if (barang) {
+    barang.addEventListener('change', function () {
+        let harga = this.options[this.selectedIndex].getAttribute('data-harga');
+        hargaInput.value = harga;
+        hitungTotal();
+    });
+}
+
+if (jasa) {
+    jasa.addEventListener('change', function () {
+        let harga = this.options[this.selectedIndex].getAttribute('data-harga');
+        let hargaJasa = parseInt(harga) || 0;
+        hargaTotal.value = hargaJasa;
+    });
+}
+
+if(paket){
+    paket.addEventListener('change', function () {
+        let harga = this.options[this.selectedIndex].getAttribute('data-harga');
+        let hargaPaket = parseInt(harga) || 0;
+        hargaTotal.value = hargaPaket;
+    });
+}
+
+if (qtyInput) {
+    qtyInput.addEventListener('input', function () {
+        hitungTotal();
+    });
+}
+
+function hitungTotal() {
+    let harga = parseInt(hargaInput.value) || 0;
+    let qty = parseInt(qtyInput.value) || 0;
+    hargaTotal.value = harga * qty;
+}
 
 </script>
 

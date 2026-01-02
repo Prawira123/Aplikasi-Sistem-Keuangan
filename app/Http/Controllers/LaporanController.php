@@ -38,15 +38,12 @@ class LaporanController extends Controller
                 case 'neraca':
                     $datas = $this->buildNeraca($start_date, $end_date);
                     break;
-
                 case 'laba_rugi':
                     $datas = $this->buildLabaRugi($start_date, $end_date);
                     break;
-
                 case 'arus_kas':
                     $datas = $this->buildArusKas($start_date, $end_date);
                     break;
-
                 case 'perubahan_modal':
                     $datas = $this->buildPerubahanModal($start_date, $end_date);
                     break;
@@ -56,13 +53,13 @@ class LaporanController extends Controller
                 case 'buku_besar':
                     $datas = $this->buildBukuBesar($start_date, $end_date);
                     break;
-                case 'transaksi_masuk':
+                case 'laporan_penjualan':
                     $datas = $this->buildTransaksiMasuk($start_date, $end_date);
                     break;
-                case 'transaksi_keluar':
+                case 'laporan_pembelian':
                     $datas = $this->buildTransaksiKeluar($start_date, $end_date);
                     break;
-                case 'laporan_stock':
+                case 'laporan_stok':
                     $datas = $this->buildLaporanStock($start_date, $end_date);
                     break;
             }
@@ -194,9 +191,7 @@ class LaporanController extends Controller
             ->whereNull('jh.deleted_at');
 
         // 3️⃣ Saldo awal kas
-        $saldo_awal = (clone $baseKas)
-            ->where('jh.tanggal', '<=', $start_date)
-            ->sum(DB::raw('jd_kas.nominal_debit - jd_kas.nominal_kredit'));
+        $saldo_awal = Akun::where('nama', 'KAS')->value('saldo_awal');
 
         // 4️⃣ Filter periode
         if ($start_date && $end_date) {
@@ -285,7 +280,9 @@ class LaporanController extends Controller
     $modal_awal = (clone $basequery)
         ->where('akuns.nama', 'MODAL')
         ->where('jurnal_headers.tanggal', '<=', $start_date)
-        ->sum(DB::raw('jurnal_details.nominal_kredit - jurnal_details.nominal_debit'));
+        ->select('akuns.saldo_awal')
+        ->value('saldo_awal');
+        // ->sum(DB::raw('jurnal_details.nominal_kredit - jurnal_details.nominal_debit'));
 
     /**
      * ================================
@@ -310,27 +307,16 @@ class LaporanController extends Controller
         ->whereBetween('jurnal_headers.tanggal', [$start_date, $end_date])
         ->sum(DB::raw('jurnal_details.nominal_debit'));
 
-    /**
-     * ================================
-     * 4️⃣ LABA BERSIH    
-     * Pendapatan (Kredit) - Beban (Debit)
-     * ================================
-     */
-    $laba_bersih = (clone $basequery)
-        ->whereIn('akuns.kelompok_id', [4, 5]) // Pendapatan & Beban
-        ->whereBetween('jurnal_headers.tanggal', [$start_date, $end_date])
-        ->sum(DB::raw('jurnal_details.nominal_kredit - jurnal_details.nominal_debit'));
+    // $laba_bersih = (clone $basequery)
+    //     ->whereIn('akuns.kelompok_id', [4, 5]) // Pendapatan & Beban
+    //     ->whereBetween('jurnal_headers.tanggal', [$start_date, $end_date])
+    //     ->sum(DB::raw('jurnal_details.nominal_kredit - jurnal_details.nominal_debit'));
 
-    /**
-     * ================================
-     * 5️⃣ MODAL AKHIR
-     * ================================
-     */
-    $modal_akhir =
-        $modal_awal +
-        $penambahan_modal +
-        $laba_bersih -
-        $prive;
+    $pendapatan = $this->getDataPendapatan($start_date, $end_date);
+    $beban = $this->getDataBeban($start_date, $end_date);
+    $laba_bersih = $pendapatan['total'] - ($beban['total'] + $beban['hpp']);
+
+    $modal_akhir = $modal_awal + $penambahan_modal + $laba_bersih - $prive;
 
     return [
         'modal_awal'        => $modal_awal,
@@ -375,7 +361,7 @@ class LaporanController extends Controller
                     $currentSaldo = $total_debit + ($item->nominal_debit - $item->nominal_kredit);
                     $data_entry['saldo_debit'] = $currentSaldo;
                     $total_debit = $currentSaldo;
-                }else{
+                }elseif($akun->normal_post == 'Kredit'){
                     $currentSaldo = $total_kredit + ($item->nominal_kredit - $item->nominal_debit);
                     $data_entry['saldo_kredit'] = $currentSaldo;
                     $total_kredit = $currentSaldo;
@@ -386,8 +372,6 @@ class LaporanController extends Controller
 
             $data[$akun->nama] = [
             "transaksi" => $list_transaksi,
-            "total_debit" => $entry->sum('nominal_debit'),
-            "total_kredit" => $entry->sum('nominal_kredit'),
             "normal_post" => $akun->normal_post,
             ]; 
         }
@@ -743,9 +727,14 @@ private function getDataLaporanStock($start_date, $end_date)
             $total += $saldo;
         }
 
+        $pendapatan = $this->getDataPendapatan($start_date, $end_date);
+        $beban = $this->getDataBeban($start_date, $end_date);
+        $laba_ditahan = $pendapatan['total'] - ($beban['total'] + $beban['hpp']);
+
         return [
             "data" => $data,
             "total" => abs($total),
+            "laba_ditahan" => $laba_ditahan,
         ];
     }
 
@@ -772,6 +761,7 @@ private function getDataLaporanStock($start_date, $end_date)
                 'akuns.id as akun_id',
             )
             ->where('kelompoks.id', 4)
+            ->where('akuns.nama', '!=','HPP')
             ->orderBy('jurnal_headers.tanggal', 'asc')
             ->get()
             ->groupBy('akun_id');
@@ -824,6 +814,7 @@ private function getDataLaporanStock($start_date, $end_date)
                 'akuns.id as akun_id',
             )
             ->where('kelompoks.id', 5)
+            ->where('akuns.nama', '!=','HPP')
             ->orderBy('jurnal_headers.tanggal', 'asc')
             ->get()
             ->groupBy('akun_id');

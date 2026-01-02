@@ -25,8 +25,8 @@ class AkunController extends Controller
 
     public function create(){
         $kategories = KategoriAkun::all();
-        $akuns = Akun::all();
-        return view('akuns.create', compact('kategories', 'akuns'));
+        $lawan_posts = Akun::all();
+        return view('akuns.create', compact('kategories', 'lawan_posts'));
     }
 
     public function store(Request $request){
@@ -53,39 +53,39 @@ class AkunController extends Controller
             'saldo_awal' => $request->saldo_awal ? $request->saldo_awal : 0,
         ]);
 
-        if($akun->saldo_awal > 0 && $akun->normal_post == 'Debit'){
-            $jurnal = $this->jurnal_entry($akun->created_at, 'Pengisian Saldo Awal '. $akun->nama,  [
-                [
-                    'akun_id' => $akun->id,
-                    'nominal_debit' => $request->saldo_awal,
-                    'nominal_kredit' => 0,
-                ],
-                [
-                    'akun_id' => $request->lawan_post,
-                    'nominal_debit' => 0,
-                    'nominal_kredit' => $request->saldo_awal,
-                ]
-            ]);
-        }elseif($akun->saldo_awal > 0 && $akun->normal_post == 'Kredit'){
-             $jurnal = $this->jurnal_entry($akun->created_at, 'Pengisian Saldo Awal '. $akun->nama,  [
-                [
-                    'akun_id' => $akun->lawan_post,
-                    'nominal_debit' => $request->saldo_awal,
-                    'nominal_kredit' => 0,
-                ],
-                [
-                    'akun_id' => $request->id,
-                    'nominal_debit' => 0,
-                    'nominal_kredit' => $request->saldo_awal,
-                ]
-            ]);
-        }
+        // if($akun->saldo_awal > 0 && $akun->normal_post == 'Debit'){
+        //     $jurnal = $this->jurnal_entry($akun->created_at, 'Pengisian Saldo Awal '. $akun->nama,  [
+        //         [
+        //             'akun_id' => $akun->id,
+        //             'nominal_debit' => $request->saldo_awal,
+        //             'nominal_kredit' => 0,
+        //         ],
+        //         [
+        //             'akun_id' => $request->lawan_post,
+        //             'nominal_debit' => 0,
+        //             'nominal_kredit' => $request->saldo_awal,
+        //         ]
+        //     ]);
+        // }elseif($akun->saldo_awal > 0 && $akun->normal_post == 'Kredit'){
+        //      $jurnal = $this->jurnal_entry($akun->created_at, 'Pengisian Saldo Awal '. $akun->nama,  [
+        //         [
+        //             'akun_id' => $request->lawan_post,
+        //             'nominal_debit' => $request->saldo_awal,
+        //             'nominal_kredit' => 0,
+        //         ],
+        //         [
+        //             'akun_id' => $akun->id,
+        //             'nominal_debit' => 0,
+        //             'nominal_kredit' => $request->saldo_awal,
+        //         ]
+        //     ]);
+        // }
 
-        if($akun->saldo_awal > 0){
-            $akun->update([
-                'jurnal_id' => $jurnal->id,
-            ]);
-        }
+        // if($akun->saldo_awal > 0){
+        //     $akun->update([
+        //         'jurnal_id' => $jurnal->id,
+        //     ]);
+        // }
 
         if ($request->action === 'save_next') {
             return redirect()
@@ -96,10 +96,11 @@ class AkunController extends Controller
         return redirect()->route('akuns.index')->with('success', 'Akun created successfully');
     }
 
-    public function edit(Akun $akun){
+    public function edit($id){
+        $akun = Akun::findOrFail($id);
         $kategories = KategoriAkun::all();
-        $akuns = Akun::all();
-        return view('akuns.edit', compact('akun', 'kategories','akuns'));
+        $lawan_posts = Akun::all();
+        return view('akuns.edit', compact('akun', 'kategories','lawan_posts'));
     }
 
     public function update(Request $request, $id){
@@ -119,74 +120,74 @@ class AkunController extends Controller
         $kelompok_id = KategoriAkun::where('id', $request->kategori_akun_id)->value('kelompok_id');
 
         $akun->update([
-            'kode' => $kode,
+            // 'kode' => $kode,
             'nama' => strtoupper($request->nama),
             'kelompok_id' => $kelompok_id,
             'normal_post' => $request->normal_post,
-            'lawan_post' => $request->lawan_post,
-            'aktivitas_kas' => $request->aktivitas_kas,
+            'lawan_post' => $request->lawan_post ?? null,
+            'aktivitas_kas' => $request->aktivitas_kas ?? null,
             'kategori_akun_id' => $request->kategori_akun_id,
             'saldo_awal' => $request->saldo_awal,
         ]);
 
 
-    if($akun->normal_post == 'Debit'){
-        if($akun->saldo_awal > 0 && $akun->jurnal_id){
-            $this->jurnal_entry_edit($akun->jurnal_id, $akun->updated_at, 'Update Saldo Awal '. $akun->nama, [
-                [
-                    'akun_id' => $akun->id,
-                    'nominal_debit' => $request->saldo_awal,
-                    'nominal_kredit' => 0,
-                ],
-                [
-                    'akun_id' => $request->lawan_post,
-                    'nominal_debit' => 0,
-                    'nominal_kredit' => $request->saldo_awal,
-                ]
-            ]);
-        }elseif($akun->saldo_awal > 0 && !$akun->jurnal_id){
-            $this->jurnal_entry($akun->created_at, 'Pengisian Saldo Awal '. $akun->nama,  [
-                [
-                    'akun_id' => $akun->id,
-                    'nominal_debit' => $request->saldo_awal,
-                    'nominal_kredit' => 0,
-                ],
-                [
-                    'akun_id' => $request->lawan_post,
-                    'nominal_debit' => 0,
-                    'nominal_kredit' => $request->saldo_awal,
-                ]
-            ]);
-        }
-    }elseif($akun->normal_post == 'Kredit'){
-        if($akun->saldo_awal > 0 && $akun->jurnal_id){
-            $this->jurnal_entry_edit($akun->jurnal_id, $akun->updated_at, 'Update Saldo Awal '. $akun->nama, [
-                [
-                    'akun_id' => $request->lawan_post,
-                    'nominal_debit' => $request->saldo_awal,
-                    'nominal_kredit' => 0,
-                ],
-                [
-                    'akun_id' => $akun->id,
-                    'nominal_debit' => 0,
-                    'nominal_kredit' => $request->saldo_awal,
-                ]
-            ]);
-        }elseif($akun->saldo_awal > 0 && !$akun->jurnal_id){
-            $this->jurnal_entry($akun->created_at, 'Pengisian Saldo Awal '. $akun->nama,  [
-                [
-                    'akun_id' => $request->lawan_post,
-                    'nominal_debit' => $request->saldo_awal,
-                    'nominal_kredit' => 0,
-                ],
-                [
-                    'akun_id' => $akun->id,
-                    'nominal_debit' => 0,
-                    'nominal_kredit' => $request->saldo_awal,
-                ]
-            ]);
-        }
-    }
+    // if($akun->normal_post == 'Debit'){
+    //     if($akun->saldo_awal > 0 && $akun->jurnal_id){
+    //         $this->jurnal_entry_edit($akun->jurnal_id, $akun->updated_at, 'Update Saldo Awal '. $akun->nama, [
+    //             [
+    //                 'akun_id' => $akun->id,
+    //                 'nominal_debit' => $request->saldo_awal,
+    //                 'nominal_kredit' => 0,
+    //             ],
+    //             [
+    //                 'akun_id' => $request->lawan_post,
+    //                 'nominal_debit' => 0,
+    //                 'nominal_kredit' => $request->saldo_awal,
+    //             ]
+    //         ]);
+    //     }elseif($akun->saldo_awal > 0 && !$akun->jurnal_id){
+    //         $this->jurnal_entry($akun->created_at, 'Pengisian Saldo Awal '. $akun->nama,  [
+    //             [
+    //                 'akun_id' => $akun->id,
+    //                 'nominal_debit' => $request->saldo_awal,
+    //                 'nominal_kredit' => 0,
+    //             ],
+    //             [
+    //                 'akun_id' => $request->lawan_post,
+    //                 'nominal_debit' => 0,
+    //                 'nominal_kredit' => $request->saldo_awal,
+    //             ]
+    //         ]);
+    //     }
+    // }elseif($akun->normal_post == 'Kredit'){
+    //     if($akun->saldo_awal > 0 && $akun->jurnal_id){
+    //         $this->jurnal_entry_edit($akun->jurnal_id, $akun->updated_at, 'Update Saldo Awal '. $akun->nama, [
+    //             [
+    //                 'akun_id' => $request->lawan_post,
+    //                 'nominal_debit' => $request->saldo_awal,
+    //                 'nominal_kredit' => 0,
+    //             ],
+    //             [
+    //                 'akun_id' => $akun->id,
+    //                 'nominal_debit' => 0,
+    //                 'nominal_kredit' => $request->saldo_awal,
+    //             ]
+    //         ]);
+    //     }elseif($akun->saldo_awal > 0 && !$akun->jurnal_id){
+    //         $this->jurnal_entry($akun->created_at, 'Pengisian Saldo Awal '. $akun->nama,  [
+    //             [
+    //                 'akun_id' => $request->lawan_post,
+    //                 'nominal_debit' => $request->saldo_awal,
+    //                 'nominal_kredit' => 0,
+    //             ],
+    //             [
+    //                 'akun_id' => $akun->id,
+    //                 'nominal_debit' => 0,
+    //                 'nominal_kredit' => $request->saldo_awal,
+    //             ]
+    //         ]);
+    //     }
+    // }
 
         return redirect()->route('akuns.index')->with('success', 'Akun updated successfully');
     }

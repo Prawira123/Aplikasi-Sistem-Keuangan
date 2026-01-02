@@ -45,7 +45,7 @@
                     <td>Rp.{{ number_format($data['nominal_kredit'], 2, ',', '.') }}</td>
                     @if($data['normal_post'] == 'Debit')
                         <td>Rp.{{ number_format($data['saldo_debit'], 2, ',', '.') }}</td>
-                    @else
+                    @elseif($entries['normal_post'] == 'Kredit')
                         <td>Rp.{{ number_format($data['saldo_kredit'], 2, ',', '.') }}</td>
                     @endif
                 </tr>
@@ -55,14 +55,6 @@
                     <td colspan="5">Data Tidak ada</td>
                 </tr>
             @endforelse
-                <tr>
-                    <td colspan="5">Total</td>
-                    @if($entries['normal_post'] == 'Debit')
-                        <td>Rp.{{ number_format($entries['total_debit'], 2, ',', '.') }}</td>
-                    @else
-                        <td>Rp.{{ number_format($entries['total_kredit'], 2, ',', '.') }}</td>
-                    @endif
-                </tr>
         </tbody>
         @endforeach
     </table>

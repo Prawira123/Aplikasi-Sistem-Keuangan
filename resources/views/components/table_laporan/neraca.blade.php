@@ -138,14 +138,18 @@
                     </tr>
                 @endforelse
                 <tr>
+                    <td colspan="4">Laba Ditahan</td>
+                    <td class="">Rp.{{ number_format($ekuitas['laba_ditahan'], 2, ',', '.') }}</td>
+                </tr>
+                <tr>
                     <td colspan="4">Total Ekuitas</td>
-                    <td class="">Rp.{{ number_format($ekuitas['total'], 2, ',', '.') }}</td>
+                    <td class="">Rp.{{ number_format($ekuitas['total'] + $ekuitas['laba_ditahan'], 2, ',', '.') }}</td>
                 </tr>
             </tbody>
             <tbody>
                 <tr>
                     <td colspan="4"><h6>Total Pasiva</h6></td>
-                    <td class=""> Rp.{{ number_format($kewajiban['total'] + $ekuitas['total'], 2, ',','.') }}</td>
+                    <td class=""> Rp.{{ number_format($kewajiban['total'] + ($ekuitas['total'] + $ekuitas['laba_ditahan']), 2, ',','.') }}</td>
                 </tr>
             </tbody>
         </table>
