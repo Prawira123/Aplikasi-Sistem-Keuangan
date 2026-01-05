@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="col-md-12">                                                                         
                                     <div class="form-group">
-                                        <label for="helperText"><h6>Harga Barang</h6></label>
+                                        <label for="helperText"><h6>Harga Paket</h6></label>
                                         <input type="number" id="harga" class="form-control" placeholder="" name="harga" value="{{ old('harga') }}">
                                         @error('harga')
                                         <div class="text-danger mt-2">

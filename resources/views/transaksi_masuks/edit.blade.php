@@ -123,7 +123,7 @@
                                             <select class="form-select" id="barang" name="product_id">
                                                 <option value="" selected disabled>Pilih barang</option>
                                                 @foreach ($products as $product)
-                                                    <option value="{{ $product->id }}" data-harga="{{ $product->harga }}" @if(old('product_id', $transaksi_masuk->product->id) == $product->id) selected @endif>{{ $product->nama }}</option>                                             
+                                                    <option value="{{ $product->id }}" data-harga="{{ $product->harga }}" @if(old('product_id', $transaksi_masuk->product_id) == $product->id) selected @endif>{{ $product->nama }}</option>                                             
                                                 @endforeach
                                             </select>
                                         </fieldset>
@@ -139,7 +139,7 @@
                                             <select class="form-select" id="jasa" name="jasa_id">
                                                 <option value="" selected disabled>Pilih Jasa</option>
                                                 @foreach ($jasas as $jasa)
-                                                    <option value="{{ $jasa->id }}" data-harga="{{ $jasa->harga }}" @if(old('jasa_id', $transaksi_masuk->jasa->id) == $jasa->id) selected @endif >{{ $jasa->nama }}</option>                                             
+                                                    <option value="{{ $jasa->id }}" data-harga="{{ $jasa->harga }}" @if(old('jasa_id', $transaksi_masuk->jasa_id) == $jasa->id) selected @endif >{{ $jasa->nama }}</option>                                             
                                                 @endforeach
                                             </select>
                                         </fieldset>
@@ -155,7 +155,7 @@
                                             <select class="form-select" id="paket" name="paket_id">
                                                 <option value="" selected disabled>Pilih Paket</option>
                                                 @foreach ($pakets as $paket)
-                                                    <option value="{{ $paket->id }}" data-harga="{{ $paket->harga }}" @if(old('paket_id', $transaksi_masuk->paket->id) == $paket->id) selected @endif>{{ $paket->nama }}</option>                                             
+                                                    <option value="{{ $paket->id }}" data-harga="{{ $paket->harga }}" @if(old('paket_id', $transaksi_masuk->paket_id) == $paket->id) selected @endif>{{ $paket->nama }}</option>                                             
                                                 @endforeach
                                             </select>
                                         </fieldset>

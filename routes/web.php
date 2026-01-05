@@ -46,7 +46,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('transaksi_keluars', TransaksiKeluarController::class)->middleware( ['role:owner,admin']);
 
-    Route::resource('jurnal_entries', JurnalEntryController::class)->middleware( ['role:owner']);
+    Route::resource('jurnal_entries', JurnalEntryController::class)->middleware( ['role:owner,admin']);
 
     Route::resource('pelanggans', PelangganController::class)->middleware( ['role:owner,admin']);
 

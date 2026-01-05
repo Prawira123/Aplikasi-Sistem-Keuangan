@@ -203,6 +203,12 @@
                         <i class="bi bi-bag-plus-fill"></i>
                         <span>Data Pembelian</span>
                     </a>
+                </li>
+                <li class="sidebar-item {{ request()->is('jurnal_entries*') ? 'active' : '' }}" id="sidebar-item">
+                    <a href="{{ route('jurnal_entries.index') }}" class='sidebar-link' id="sidebar-link">
+                        <i class="bi bi-arrow-down-right-square-fill"></i>
+                        <span>Jurnal Entry</span>
+                    </a>
                 </li>            
                 <li class="sidebar-item">
                     <a href="{{ route('logout') }}" class="sidebar-link"

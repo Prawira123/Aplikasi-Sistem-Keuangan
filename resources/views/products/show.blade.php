@@ -8,7 +8,7 @@
 </header>
             
 <div class="page-heading">
-    <h3>Halaman Product</h3>
+    <h3>Halaman Barang</h3>
 </div> 
 
 <div id="main w-full">   
@@ -17,14 +17,14 @@
         <div class="row">
 
             <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Tabel Product</h3>
-                <p class="text-subtitle text-muted">Mengelola Product</p>
+                <h3>Tabel Barang</h3>
+                <p class="text-subtitle text-muted">Mengelola Barang</p>
             </div>
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard.index') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="">Product</a></li>
+                        <li class="breadcrumb-item"><a href="">Barang</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Detail</li>
                     </ol>
                 </nav>
@@ -46,7 +46,7 @@
                 <h6>Harga Jual : <span class="text-info">Rp. {{ number_format($product->harga, 2, ',', '.') }}</span></h6>
             </div>
             <div class="card-body d-flex justify-content-between">
-                <h6>Stock : <span class="text-info">{{ $product->stock > 0 ? $product->stock . ' pcs' : '0 pcs' }}</span></h6>
+                <h6>Stok : <span class="text-info">{{ $product->stock > 0 ? $product->stock . ' pcs' : '0 pcs' }}</span></h6>
             </div>
             <div class="card-body d-flex justify-content-between">
                 <h6>Tanggal dibuat : <span class="text-info">{{ \Carbon\Carbon::parse($product->created_at)->format('d F Y') }}</span></h6>

@@ -31,7 +31,7 @@ class LabaRugiExport implements FromCollection, WithEvents
         /** =======================
          *  PENDAPATAN
          *  ======================= */
-        $data[] = ['Kode'=>'', 'Akun'=>'PENDAPATAN', 'Total'=>''];
+        $data[] = ['Kode' => 'PENDAPATAN', 'Akun' => '', 'Total' => ''];
 
         foreach ($this->labaRugi['pendapatan']['data'] ?? [] as $akun) {
             $data[] = [
@@ -42,9 +42,9 @@ class LabaRugiExport implements FromCollection, WithEvents
         }
 
         $data[] = [
-            'Kode'=>'',
-            'Akun'=>'Total Pendapatan',
-            'Total'=>$this->labaRugi['pendapatan']['total'] ?? 0
+            'Kode'  => '',
+            'Akun'  => 'Total Pendapatan',
+            'Total' => $this->labaRugi['pendapatan']['total'] ?? 0
         ];
 
         $data[] = [];
@@ -52,9 +52,9 @@ class LabaRugiExport implements FromCollection, WithEvents
         /** =======================
          *  BEBAN
          *  ======================= */
-        $data[] = ['Kode'=>'', 'Akun'=>'BEBAN', 'Total'=>''];
+        $data[] = ['Kode' => 'BEBAN', 'Akun' => '', 'Total' => ''];
 
-        // HPP khusus
+        // HPP
         if (!empty($this->labaRugi['beban']['hpp'])) {
             $data[] = [
                 'Kode'  => '',
@@ -71,10 +71,15 @@ class LabaRugiExport implements FromCollection, WithEvents
             ];
         }
 
+        /** === TOTAL BEBAN (POSISI BENAR) === */
+        $totalBeban =
+            ($this->labaRugi['beban']['total'] ?? 0)
+            + ($this->labaRugi['beban']['hpp'] ?? 0);
+
         $data[] = [
-            'Kode'=>'',
-            'Akun'=>'Total Beban',
-            'Total'=>$this->labaRugi['beban']['total'] ?? 0
+            'Kode'  => '',
+            'Akun'  => 'Total Beban',
+            'Total' => $totalBeban
         ];
 
         $data[] = [];
@@ -84,13 +89,12 @@ class LabaRugiExport implements FromCollection, WithEvents
          *  ======================= */
         $labaBersih =
             ($this->labaRugi['pendapatan']['total'] ?? 0)
-            - (($this->labaRugi['beban']['total'] ?? 0)
-            + ($this->labaRugi['beban']['hpp'] ?? 0));
+            - $totalBeban;
 
         $data[] = [
-            'Kode'=>'',
-            'Akun'=>'LABA / RUGI BERSIH',
-            'Total'=>$labaBersih
+            'Kode'  => 'LABA / RUGI BERSIH',
+            'Akun'  => '',
+            'Total' => $labaBersih
         ];
 
         return collect($data);
@@ -107,11 +111,11 @@ class LabaRugiExport implements FromCollection, WithEvents
                 $sheet->mergeCells('A1:C1')->setCellValue('A1', 'LAPORAN LABA RUGI');
                 $sheet->mergeCells('A2:C2')->setCellValue(
                     'A2',
-                    'Periode: '.$this->startDate.' s/d '.$this->endDate
+                    'Periode: ' . $this->startDate . ' s/d ' . $this->endDate
                 );
 
-                // Header tabel
-                $sheet->fromArray(['Kode','Akun','Total'], null, 'A3');
+                // Header
+                $sheet->fromArray(['Kode', 'Akun', 'Total'], null, 'A3');
 
                 $sheet->getStyle('A1:C3')->getFont()->setBold(true);
                 $sheet->getStyle('A1:C3')->getAlignment()
@@ -133,7 +137,7 @@ class LabaRugiExport implements FromCollection, WithEvents
                     ->getNumberFormat()
                     ->setFormatCode('#,##0');
 
-                // Kolom lebar
+                // Lebar kolom
                 $sheet->getColumnDimension('A')->setWidth(15);
                 $sheet->getColumnDimension('B')->setWidth(40);
                 $sheet->getColumnDimension('C')->setWidth(20);

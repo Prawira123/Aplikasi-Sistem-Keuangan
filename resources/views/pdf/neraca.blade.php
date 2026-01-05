@@ -212,17 +212,20 @@
         @endforelse
 
         <tr class="total-row">
+            <td colspan="4">Laba Ditahan</td>
+            <td class="text-right">{{ number_format($ekuitas['laba_ditahan'], 2, ',', '.') }}</td>
+        </tr>
+        <tr class="total-row">
             <td colspan="4">Total Ekuitas</td>
-            <td class="text-right">{{ number_format($ekuitas['total'], 2, ',', '.') }}</td>
+            <td class="text-right">{{ number_format($ekuitas['total'] + $ekuitas['laba_ditahan'], 2, ',', '.') }}</td>
         </tr>
 
         <tr class="grand-total">
             <td colspan="4">TOTAL PASIVA</td>
             <td class="text-right">
-                {{ number_format($kewajiban['total'] + $ekuitas['total'], 2, ',', '.') }}
+                {{ number_format($kewajiban['total'] + ($ekuitas['total'] + $ekuitas['laba_ditahan']), 2, ',', '.') }}
             </td>
         </tr>
-
     </tbody>
 </table>
 

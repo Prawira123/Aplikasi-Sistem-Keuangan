@@ -86,7 +86,7 @@ return new class extends Migration
             $table->string('kode');
             $table->date('tanggal');
             $table->text('keterangan')->nullable();
-            $table->enum('tipe', ['jasa', 'barang', 'paket']);
+            $table->enum('tipe', ['Jasa', 'Barang', 'Paket']);
             $table->integer('qty')->nullable();
             $table->integer('harga_satuan')->nullable();
             $table->integer('harga_total');

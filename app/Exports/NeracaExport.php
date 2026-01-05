@@ -34,10 +34,21 @@ class NeracaExport implements FromCollection, WithEvents
                         'Total' => $akun['total'],
                     ];
                 }
-                $data[] = ['Kode'=>'','Akun'=>$section.' Total','Total'=>$neraca[$section]['total']];
+                if ($section === 'ekuitas') {
+                    $data[] = ['Kode'=>'','Akun'=>'Laba Ditahan','Total'=>$neraca[$section]['laba_ditahan']];
+                    $data[] = ['Kode'=>'','Akun'=>$section.' Total','Total'=>$neraca[$section]['total'] + $neraca[$section]['laba_ditahan']];
+                } else {
+                    $data[] = ['Kode'=>'','Akun'=>$section.' Total','Total'=>$neraca[$section]['total']];
+                }
                 $data[] = [];
             }
         }
+
+        // Tambahkan total aktiva dan total pasiva
+        $totalAktiva = $neraca['asetLancar']['total'] + $neraca['asetTetap']['total'];
+        $totalPasiva = $neraca['kewajiban']['total'] + ($neraca['ekuitas']['total'] + $neraca['ekuitas']['laba_ditahan']);
+        $data[] = ['Kode'=>'','Akun'=>'Total Aktiva','Total'=>$totalAktiva];
+        $data[] = ['Kode'=>'','Akun'=>'Total Pasiva','Total'=>$totalPasiva];
 
         return collect($data);
     }

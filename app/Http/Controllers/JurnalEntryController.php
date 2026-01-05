@@ -14,17 +14,14 @@ class JurnalEntryController extends Controller
         $start = $request->start_date;
         $end   = $request->end_date;
 
-        // BASE QUERY
         $query = JurnalDetail::with(['jurnal_header', 'akun'])
             ->join('jurnal_headers', 'jurnal_headers.id', '=', 'jurnal_details.jurnal_header_id')
             ->select('jurnal_details.*'); // penting agar tidak terjadi konflik kolom
 
-        // FILTER TANGGAL
         if ($start && $end) {
             $query->whereBetween('jurnal_headers.tanggal', [$start, $end]);
         }
 
-        // ORDER BY
         $jurnal_datas = $query->orderBy('jurnal_headers.tanggal', 'asc')->get();
 
         return view('jurnal_entries.index', compact('jurnal_datas'));
@@ -83,8 +80,6 @@ class JurnalEntryController extends Controller
                     'nominal_kredit' => $request->nominal,
                 ],
             ];
-
-
             foreach($items as $item){
                 JurnalDetail::create([
                     'jurnal_header_id' => $item['jurnal_header_id'],
@@ -169,9 +164,6 @@ class JurnalEntryController extends Controller
                 'nominal_kredit' => $request->nominal,
             ]);
         }
-
-        
-
         return redirect()->route('jurnal_entries.index')->with('success', 'jurnal entry updated successfully');
     }
 

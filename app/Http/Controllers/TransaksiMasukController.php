@@ -80,7 +80,7 @@ class TransaksiMasukController extends Controller
             'tanggal' => $request->tanggal,
             'keterangan' => $request->keterangan,
             'tipe' => $request->tipe,
-            'qty' => $request->qty,
+            'qty' => $request->qty ?? 1,
             'harga_satuan' => $request->harga_satuan,
             'harga_total' => $request->harga_total,  
             'akun_debit_id' => $request->akun_debit_id,
@@ -174,7 +174,7 @@ class TransaksiMasukController extends Controller
 
     public function edit($id){
 
-        $transaksi_masuk = TransaksiMasuk::findOrFail($id);
+        $transaksi_masuk = TransaksiMasuk::with('product', 'jasa', 'paket')->findOrFail($id);
         $products = Product::select('id', 'nama', 'harga')->get();
         $jasas = Jasa::select('id', 'nama', 'harga')->get();
         $karyawans = Karyawan::select('id', 'fullname')->get();
