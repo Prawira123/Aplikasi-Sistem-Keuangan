@@ -75,7 +75,7 @@
 
 <div class="header">
     <img src="{{ public_path('images/fulllogo.png') }}" alt="Logo">
-    <h1>LAPORAN KARTU STOCK</h1>
+    <h1>LAPORAN STOK</h1>
     <h3>Bengkel Kembang Motor</h3>
     <p>Periode {{ request('start_date') }} – {{ request('end_date') }}</p>
 </div>
@@ -91,10 +91,10 @@
         <tr>
             <th>No</th>
             <th>Tanggal</th>
-            <th>Stock Awal</th>
-            <th>Stock Masuk</th>
-            <th>Stock Keluar</th>
-            <th>Stock Akhir</th>
+            <th>Stok Awal</th>
+            <th>Stok Masuk</th>
+            <th>Stok Keluar</th>
+            <th>Stok Akhir</th>
         </tr>
     </thead>
     <tbody>

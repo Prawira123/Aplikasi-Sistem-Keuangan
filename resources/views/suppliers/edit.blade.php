@@ -44,7 +44,7 @@
                     @method('PUT')
                     <div class="card">
                         <div class="d-flex">
-                            <a href="{{ route('suppliers.index') }}" class="btn btn-primary mb-3 ms-auto">Back to list</a>
+                            <a href="{{ route('suppliers.index') }}" class="btn btn-primary mb-3 ms-auto">Kembali</a>
                         </div>
                         <div class="card-header">
                             <h4 class="card-title">Perbarui Supplier</h4>

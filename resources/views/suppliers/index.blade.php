@@ -52,7 +52,7 @@
                 <table class="table table-striped" id="table1">
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Nama</th>
                             <th>No Telp</th>
                             <th>Alamat</th>
                             <th>Aksi</th>

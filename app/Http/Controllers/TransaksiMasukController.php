@@ -80,7 +80,7 @@ class TransaksiMasukController extends Controller
             'tanggal' => $request->tanggal,
             'keterangan' => $request->keterangan,
             'tipe' => $request->tipe,
-            'qty' => $request->qty ?? 1,
+            'qty' => $request->qty ? $request->qty : 1,
             'harga_satuan' => $request->harga_satuan,
             'harga_total' => $request->harga_total,  
             'akun_debit_id' => $request->akun_debit_id,
@@ -223,7 +223,7 @@ class TransaksiMasukController extends Controller
             'tanggal' => $request->tanggal,
             'keterangan' => $request->keterangan,
             'tipe' => $request->tipe,
-            'qty' => $request->qty,
+            'qty' => $request->qty ? $request->qty : 1,
             'harga_satuan' => $request->harga_satuan,
             'harga_total' => $harga_total,  
             'akun_debit_id' => $request->akun_debit_id,
@@ -250,12 +250,12 @@ class TransaksiMasukController extends Controller
             [
                 [
                 'akun_id' => $this->HPP()->id ,
-                'nominal_debit' => $transaksi_masuk->product->harga_beli ,
+                'nominal_debit' => $transaksi_masuk->product->harga_beli  * $request->qty,
                 'nominal_kredit' => 0,
                 ],
                 [
                 'akun_id' => $transaksi_masuk->product->akun_persediaan,
-                'nominal_kredit' => $transaksi_masuk->product->harga_beli ,
+                'nominal_kredit' => $transaksi_masuk->product->harga_beli * $request->qty,
                 'nominal_debit' => 0,
                 ],
             ]);
@@ -348,17 +348,14 @@ class TransaksiMasukController extends Controller
     }
     public function jurnal_entry_edit($id, $tanggal, $keterangan, $items = [], $items2 = [])
     {
-        // update header
         $jurnal_header = JurnalHeader::findOrFail($id);
         $jurnal_header->update([
             'tanggal' => $tanggal,
             'keterangan' => $keterangan,
         ]);
 
-        // hapus semua detail lama
         JurnalDetail::where('jurnal_header_id', $id)->delete();
 
-        // insert ulang detail baru
         foreach ($items as $item) {
             JurnalDetail::create([
                 'jurnal_header_id' => $id,
@@ -376,7 +373,7 @@ class TransaksiMasukController extends Controller
                 'nominal_kredit' => $item['nominal_kredit'],
             ]);
         }
-
+        
         return $jurnal_header;
     }
 

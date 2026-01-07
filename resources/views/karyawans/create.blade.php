@@ -8,7 +8,7 @@
 </header>
             
 <div class="page-heading">
-    <h3>Halaman Karyawans</h3>
+    <h3>Halaman Karyawan</h3>
 </div> 
 
 <div id="main w-full">  
@@ -43,7 +43,7 @@
                     @csrf
                     <div class="card">
                         <div class="d-flex">
-                                <a href="{{ route('karyawans.index') }}" class="btn btn-primary mb-3 ms-auto">Kirim</a>
+                                <a href="{{ route('karyawans.index') }}" class="btn btn-primary mb-3 ms-auto">Kembali</a>
                             </div>
                         <div class="card-header">
                             <h4 class="card-title">Tambah Karyawan</h4>
@@ -82,17 +82,8 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="helperText"><h6>Tanggal Lahir</h6></label>
-                                        <input type="date" id="helperText" class="form-control" placeholder="Due date" name="birth_date">
+                                        <input type="date" id="helperText" class="form-control date" placeholder="Due date" name="birth_date">
                                         @error('birth_date')
-                                        <div class="text-danger mt-2">
-                                            {{ $message }}
-                                        </div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="helperText"><h6>Tanggal Diterima</h6></label>
-                                        <input type="date" id="helperText" class="form-control" placeholder="Due date" name="hire_date">
-                                        @error('hire_date')
                                         <div class="text-danger mt-2">
                                             {{ $message }}
                                         </div>

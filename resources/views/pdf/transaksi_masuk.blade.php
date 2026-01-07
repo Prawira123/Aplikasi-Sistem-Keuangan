@@ -72,7 +72,7 @@
 
 <div class="header">
     <img src="{{ public_path('images/fulllogo.png') }}" alt="Logo">
-    <h1>LAPORAN TRANSAKSI MASUK</h1>
+    <h1>LAPORAN PENJUALAN</h1>
     <h3>Bengkel Kembang Motor</h3>
     <p>Periode {{ request('start_date') }} – {{ request('end_date') }}</p>
 </div>

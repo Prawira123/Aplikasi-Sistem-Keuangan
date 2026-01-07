@@ -71,6 +71,7 @@ class GajiKaryawanController extends Controller
             'karyawan_id' => $request->karyawan_id,
             'kehadiran' => $request->kehadiran,
             'total_gaji' => $total_gaji,
+            'status' => 'Belum',
         ]);
 
         return redirect()->route('gaji_karyawans.index')->with('success', 'Employee updated successfully');
@@ -93,7 +94,7 @@ class GajiKaryawanController extends Controller
     public function jurnal_create(){
         $akuns = Akun::select('id', 'nama')->get();
         $gaji_karyawan = GajiKaryawan::with('karyawan')->get();
-        $total_gaji = $gaji_karyawan->sum('total_gaji');
+        $total_gaji = $gaji_karyawan->where('status', 'Belum')->sum('total_gaji');
 
         return view('gaji_karyawans.jurnal_create', compact('akuns', 'total_gaji'));
     }
@@ -118,6 +119,14 @@ class GajiKaryawanController extends Controller
                 'nominal_kredit' => $request->total_gaji,
             ],
         ]);
+
+        $gaji_karyawans = GajiKaryawan::where('status', 'Belum')->get();
+
+        foreach($gaji_karyawans as $gaji_karyawan){
+            $gaji_karyawan->update([
+                'status' => 'Sudah',
+            ]);
+        }
 
         return redirect()->route('gaji_karyawans.index')->with('success', 'Pembayaran Gaji Karyawan successfully');
     }

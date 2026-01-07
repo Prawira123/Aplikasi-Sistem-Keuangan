@@ -29,7 +29,6 @@ class KaryawanController extends Controller
             'phone_number' => 'required|max:11',
             'address' => 'required|max:255',
             'birth_date' => 'required|date',
-            'hire_date' => 'required|date',
             'salary' => 'required|numeric',
         ]);
         $formatted = implode('-', str_split($request->phone_number, 3));
@@ -41,7 +40,7 @@ class KaryawanController extends Controller
             'phone_number' => $phone_number,
             'address' => $request->address,
             'birth_date' => $request->birth_date,
-            'hire_date' => $request->hire_date,
+            'hire_date' => now(),
             'salary' => $request->salary,
         ]);
 
@@ -70,7 +69,6 @@ class KaryawanController extends Controller
             'phone_number' => 'required|max:16',
             'address' => 'required|max:255',
             'birth_date' => 'required|date',
-            'hire_date' => 'required|date',
             'salary' => 'required|numeric',
         ]);
 

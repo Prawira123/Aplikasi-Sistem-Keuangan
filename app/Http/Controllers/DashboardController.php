@@ -20,6 +20,9 @@ class DashboardController extends Controller
     public function index(){
         $transaksi_masuks = TransaksiMasuk::sum('harga_total');
         $transaksi_keluars = TransaksiKeluar::sum('harga_total');
+        $banyak_penjualan = TransaksiMasuk::count();
+        $banyak_pembelian = TransaksiKeluar::count();
+        $total_transaksi = $banyak_penjualan + $banyak_pembelian;
         $likuiditas = $this->getDataLikuiditas();
         $pembelian = $this->getDataPembelian();
         $user = Auth::user();
@@ -27,7 +30,7 @@ class DashboardController extends Controller
         $jasas = Jasa::count();
         $pakets = Paket::count();
         $pelanggans = $this->getDataPelanggan();
-        return view('dashboard.index', compact('transaksi_masuks', 'transaksi_keluars', 'products', 'jasas', 'pakets', 'pelanggans', 'likuiditas', 'user', 'pembelian'));
+        return view('dashboard.index', compact('transaksi_masuks', 'transaksi_keluars', 'products', 'jasas', 'pakets', 'pelanggans', 'likuiditas', 'user', 'pembelian', 'total_transaksi'));
     }
 
 

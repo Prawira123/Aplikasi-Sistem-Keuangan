@@ -26,10 +26,10 @@
             <tr>
                 <th>No</th>
                 <th>Tanggal</th>
-                <th>Stock Awal</th>
-                <th>Stock Masuk</th>
-                <th>Stock keluar</th>
-                <th>Stock Akhir</th>
+                <th>Stok Awal</th>
+                <th>Stok Masuk</th>
+                <th>Stok keluar</th>
+                <th>Stok Akhir</th>
             </tr>
         </thead>
         <tbody>

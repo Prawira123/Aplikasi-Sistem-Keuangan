@@ -82,7 +82,7 @@
                                 <div class="col-md-12">                                                                         
                                     <div class="form-group">
                                         <label for="helperText"><h6>Gaji Per hari</h6></label>
-                                        <input type="number" id="salary" class="form-control" placeholder="" name="gaji_harian" value="{{ old('gaji_harian', $gaji_karyawan->karyawan->salary) }}">
+                                        <input type="number" id="salary" class="form-control" placeholder="" name="gaji_harian" value="{{ old('gaji_harian', $gaji_karyawan->karyawan->salary) }}" disabled>
                                         @error('gaji_harian')
                                         <div class="text-danger mt-2">
                                             {{ $message }}

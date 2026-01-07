@@ -43,7 +43,7 @@
                     @csrf
                     <div class="card">
                         <div class="d-flex">
-                            <a href="{{ route('gaji_karyawans.index') }}" class="btn btn-primary mb-3 ms-auto">Back to list</a>
+                            <a href="{{ route('gaji_karyawans.index') }}" class="btn btn-primary mb-3 ms-auto">Kembali</a>
                         </div>
                         <div class="card-header">
                             <h4 class="card-title">Pembayaran Gaji Karyawan</h4>
@@ -95,7 +95,7 @@
                                 <div class="col-md-12">                                                                         
                                     <div class="form-group">
                                         <label for="helperText"><h6>Total Gaji</h6></label>
-                                        <input type="text" id="total_gaji" class="form-control" name="total_gaji" value="{{$total_gaji }}" readonly>
+                                        <input type="text" id="total_gaji" class="form-control" name="total_gaji" value="{{$total_gaji}}" readonly>
                                     </div>   
                                 </div>
                             </div>

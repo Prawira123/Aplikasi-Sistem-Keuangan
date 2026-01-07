@@ -47,7 +47,7 @@
                             <a href="{{ route('pelanggans.index') }}" class="btn btn-primary mb-3 ms-auto">Kembali</a>
                         </div>
                         <div class="card-header">
-                            <h4 class="card-title">Perbauri Pelanggan</h4>
+                            <h4 class="card-title">Perbarui Pelanggan</h4>
                         </div>
 
                         <div class="card-body">

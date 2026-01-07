@@ -270,47 +270,21 @@ class LaporanController extends Controller
         ->whereNull('jurnal_details.deleted_at')
         ->whereNull('jurnal_headers.deleted_at');
 
-    /**
-     * ================================
-     * 1️⃣ MODAL AWAL
-     * Saldo akun modal sebelum periode
-     * Normal post: KREDIT
-     * ================================
-     */
     $modal_awal = (clone $basequery)
         ->where('akuns.nama', 'MODAL')
         ->where('jurnal_headers.tanggal', '<=', $start_date)
         ->select('akuns.saldo_awal')
         ->value('saldo_awal');
-        // ->sum(DB::raw('jurnal_details.nominal_kredit - jurnal_details.nominal_debit'));
 
-    /**
-     * ================================
-     * 2️⃣ PENAMBAHAN MODAL
-     * Transaksi modal dalam periode
-     * ================================
-     */
     $penambahan_modal = (clone $basequery)
         ->where('akuns.nama', 'MODAL')
         ->whereBetween('jurnal_headers.tanggal', [$start_date, $end_date])
         ->sum(DB::raw('jurnal_details.nominal_kredit'));
 
-    /**
-     * ================================
-     * 3️⃣ PRIVE
-     * Mengurangi modal
-     * Normal post: DEBIT
-     * ================================
-     */
     $prive = (clone $basequery)
         ->where('akuns.nama', 'PRIVE')
         ->whereBetween('jurnal_headers.tanggal', [$start_date, $end_date])
         ->sum(DB::raw('jurnal_details.nominal_debit'));
-
-    // $laba_bersih = (clone $basequery)
-    //     ->whereIn('akuns.kelompok_id', [4, 5]) // Pendapatan & Beban
-    //     ->whereBetween('jurnal_headers.tanggal', [$start_date, $end_date])
-    //     ->sum(DB::raw('jurnal_details.nominal_kredit - jurnal_details.nominal_debit'));
 
     $pendapatan = $this->getDataPendapatan($start_date, $end_date);
     $beban = $this->getDataBeban($start_date, $end_date);
@@ -387,18 +361,16 @@ private function getDataLaporanStock($start_date, $end_date)
 
     foreach ($products as $product) {
 
-        // ===============================
-        // 1️⃣ HITUNG STOK AWAL
-        // ===============================
-        // STOK MASUK = PEMBELIAN
         $stokMasukSebelum = DB::table('transaksi_keluars')
             ->where('product_id', $product->id)
+            ->whereNull('deleted_at')
             ->where('tanggal', '<', $start_date)
             ->sum('qty');
 
         // STOK KELUAR = PENJUALAN BARANG
         $stokKeluarBarangSebelum = DB::table('transaksi_masuks')
             ->where('product_id', $product->id)
+            ->whereNull('deleted_at')
             ->where('tanggal', '<', $start_date)
             ->sum('qty');
 
@@ -406,19 +378,16 @@ private function getDataLaporanStock($start_date, $end_date)
         $stokKeluarPaketSebelum = DB::table('pakets')
             ->join('transaksi_masuks', 'transaksi_masuks.paket_id', '=', 'pakets.id')
             ->where('pakets.product_id', $product->id)
+            ->whereNull('transaksi_masuks.deleted_at')
             ->where('transaksi_masuks.tanggal', '<', $start_date)
             ->count();
 
         $stokAwal = $stokMasukSebelum
             - ($stokKeluarBarangSebelum + $stokKeluarPaketSebelum);
 
-        // ===============================
-        // 2️⃣ TRANSAKSI DALAM RANGE
-        // ===============================
-
-        // STOK MASUK → PEMBELIAN
         $masuk = DB::table('transaksi_keluars')
             ->where('product_id', $product->id)
+            ->whereNull('deleted_at')
             ->whereBetween('tanggal', [$start_date, $end_date])
             ->select(
                 'tanggal',
@@ -429,6 +398,7 @@ private function getDataLaporanStock($start_date, $end_date)
         // STOK KELUAR → PENJUALAN BARANG
         $keluarBarang = DB::table('transaksi_masuks')
             ->where('product_id', $product->id)
+            ->whereNull('deleted_at')
             ->whereBetween('tanggal', [$start_date, $end_date])
             ->select(
                 'tanggal',
@@ -440,10 +410,11 @@ private function getDataLaporanStock($start_date, $end_date)
         $keluarPaket = DB::table('pakets')
             ->join('transaksi_masuks', 'transaksi_masuks.paket_id', '=', 'pakets.id')
             ->where('pakets.product_id', $product->id)
+            ->whereNull('transaksi_masuks.deleted_at')
             ->whereBetween('transaksi_masuks.tanggal', [$start_date, $end_date])
             ->select(
-                'transaksi_masuks.tanggal as tanggal', // ✅ sumber tanggal BENAR
-                DB::raw(' 1 as qty'),          // atau 1
+                'transaksi_masuks.tanggal as tanggal',
+                DB::raw('1 as qty'),
                 DB::raw("'keluar' as tipe")
             );
 
@@ -454,9 +425,6 @@ private function getDataLaporanStock($start_date, $end_date)
             ->get()
             ->groupBy('tanggal');
 
-        // ===============================
-        // 3️⃣ KARTU STOK
-        // ===============================
         $stok = $stokAwal;
         $kartuStok = [];
 
@@ -467,22 +435,19 @@ private function getDataLaporanStock($start_date, $end_date)
             $stokAkhir = $stok + $totalMasuk - $totalKeluar;
 
             $kartuStok[] = [
-                'tanggal' => $tanggal,
-                'stok_awal' => $stok,
-                'masuk' => $totalMasuk,
-                'keluar' => $totalKeluar,
-                'stok_akhir' => $stokAkhir,
+                'tanggal'     => $tanggal,
+                'stok_awal'   => $stok,
+                'masuk'       => $totalMasuk,
+                'keluar'      => $totalKeluar,
+                'stok_akhir'  => $stokAkhir,
             ];
 
             $stok = $stokAkhir;
         }
 
-        // ===============================
-        // 4️⃣ SIMPAN PER PRODUK
-        // ===============================
         if (!empty($kartuStok)) {
             $data[$product->nama] = [
-                'kode' => $product->kode,
+                'kode'       => $product->kode,
                 'kartu_stok' => $kartuStok
             ];
         }
@@ -490,6 +455,7 @@ private function getDataLaporanStock($start_date, $end_date)
 
     return $data;
 }
+
 
 
     private function getDataTransaksiMasuk($start_date, $end_date){

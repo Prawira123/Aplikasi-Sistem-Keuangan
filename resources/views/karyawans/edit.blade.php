@@ -83,17 +83,8 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="helperText"><h6>Tanggal Lahir</h6></label>
-                                        <input type="datetime-local" id="helperText" class="form-control" placeholder="Due date" name="birth_date" value="{{ old('birth_date', \Carbon\Carbon::parse($karyawan->birth_date)->format('Y-m-d\TH:i')) }}">
+                                        <input type="date" id="helperText" class="form-control date" placeholder="Due date" name="birth_date" value="{{ old('birth_date', \Carbon\Carbon::parse($karyawan->birth_date)->format('Y-m-d')) }}">
                                         @error('birth_date')
-                                        <div class="text-danger mt-2">
-                                            {{ $message }}
-                                        </div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="helperText"><h6>Tanggal Diterima</h6></label>
-                                        <input type="datetime-local" id="helperText" class="form-control" placeholder="Due date" name="hire_date"value="{{ old('birth_date', \Carbon\Carbon::parse($karyawan->hire_date)->format('Y-m-d\TH:i')) }}">
-                                        @error('hire_date')
                                         <div class="text-danger mt-2">
                                             {{ $message }}
                                         </div>

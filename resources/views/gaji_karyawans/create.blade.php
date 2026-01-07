@@ -81,7 +81,7 @@
                                 <div class="col-md-12">                                                                         
                                     <div class="form-group">
                                         <label for="helperText"><h6>Gaji Per hari</h6></label>
-                                        <input type="number" id="salary" class="form-control" placeholder="" name="harga" value="">
+                                        <input type="number" id="salary" class="form-control" placeholder="" name="harga" value="" disabled>
                                         @error('harga')
                                         <div class="text-danger mt-2">
                                             {{ $message }}

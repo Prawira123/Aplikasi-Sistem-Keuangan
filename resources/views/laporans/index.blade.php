@@ -48,8 +48,8 @@
                                 <option value="buku_besar">Buku Besar</option>
                                 <option value="jurnal_umum">Jurnal Umum</option>
                                 <option value="perubahan_modal">Perubahan Modal</option>
-                                <option value="laporan_pembelian">Laporan Penjualan</option>
-                                <option value="laporan_penjualan">Laporan Pembelian</option>
+                                <option value="laporan_penjualan">Laporan Penjualan</option>
+                                <option value="laporan_pembelian">Laporan Pembelian</option>
                                 <option value="laporan_stok">Laporan Stok</option>
                             </select>
                         </fieldset>
@@ -191,9 +191,13 @@
         // Set select box ke nilai yang dipilih
         laporanList.value = laporan;
 
+        const text = laporan.replace('_', ' ');
+
+        const titleCase = text.replace(/\b\w/g, char => char.toUpperCase());
+
         // Update judul berdasarkan laporan (tanpa menyembunyikan div, karena Blade sudah menangani)
         if (laporan) {
-            document.getElementById('title').innerHTML = "Data Laporan " + laporan.replace('_', ' ');
+            document.getElementById('title').innerHTML =  titleCase;
         }
     });
 

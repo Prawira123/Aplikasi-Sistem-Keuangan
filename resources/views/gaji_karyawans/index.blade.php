@@ -27,8 +27,25 @@
                                         </div>
                                     </div>
                                     <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                        <h6 class="text-muted font-semibold">Total Gaji Karyawan</h6>
-                                        <h6 class="font-extrabold mb-0">Rp.{{ number_format($gaji_karyawans->sum('total_gaji'), 2, ',', '.') }}</h6>
+                                        <h6 class="text-muted font-semibold">Total Gaji Karyawan Lunas</h6>
+                                        <h6 class="font-extrabold mb-0">Rp.{{ number_format($gaji_karyawans->where('status', 'Sudah')->sum('total_gaji'), 2, ',', '.') }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-6 col-md-6">
+                        <div class="card"> 
+                            <div class="card-body px-4 py-4-5">
+                                <div class="row">
+                                    <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start ">
+                                        <div class="stats-icon red mb-2">
+                                            <i class="iconly-boldProfile"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
+                                        <h6 class="text-muted font-semibold">Total Gaji Karyawan Pending</h6>
+                                        <h6 class="font-extrabold mb-0">Rp.{{ number_format($gaji_karyawans->where('status', 'Belum')->sum('total_gaji'), 2, ',', '.') }}</h6>
                                     </div>
                                 </div>
                             </div>
@@ -76,6 +93,7 @@
                             <th>Kehadiran</th>
                             <th>Gaji Harian</th>
                             <th>Total Gaji</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -86,6 +104,11 @@
                             <td >{{ $gaji_karyawan->kehadiran }}</td>
                             <td >Rp.{{ number_format($gaji_karyawan->karyawan->salary, 2, ',', '.') }}</td>
                             <td >Rp.{{ number_format($gaji_karyawan->total_gaji, 2, ',', '.') }}</td>
+                            @if($gaji_karyawan->status == 'Belum')
+                            <td class="text-danger" >{{ $gaji_karyawan->status }}</td>
+                            @elseif($gaji_karyawan->status == 'Sudah')
+                            <td class="text-success" >{{ $gaji_karyawan->status }}</td>
+                            @endif
                             <td class="d-flex gap-2 flex-wrap">
                                 <a href="{{ route('gaji_karyawans.show', $gaji_karyawan->id) }}" class="btn btn-info btn-sm">Detail</a>
                                 <a href="{{ route('gaji_karyawans.edit', $gaji_karyawan->id) }}" class="btn btn-warning btn-sm">Edit</a>

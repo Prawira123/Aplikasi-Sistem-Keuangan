@@ -128,17 +128,6 @@
                 </td>
             </tr>
         @endforelse
-
-        <tr class="total-row">
-            <td colspan="5">Total</td>
-            <td class="text-right">
-                @if($entries['normal_post'] == 'Debit')
-                    {{ number_format($entries['total_debit'], 2, ',', '.') }}
-                @else
-                    {{ number_format($entries['total_kredit'], 2, ',', '.') }}
-                @endif
-            </td>
-        </tr>
     </tbody>
 </table>
 

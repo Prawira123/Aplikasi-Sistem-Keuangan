@@ -20,10 +20,8 @@ class ProductController extends Controller
     }
 
     public function create(){
-        $akuns = Akun::join('kategori_akuns', 'kategori_akuns.id', '=', 'akuns.kategori_akun_id')
-        ->where('kategori_akuns.nama', 'PERSEDIAAN')
-        ->select('akuns.nama', 'akuns.id')
-        ->get();
+        $akuns = Akun::select('akuns.nama', 'akuns.id')->get();
+
         return view('products.create', compact('akuns'));
     }
 
@@ -54,10 +52,7 @@ class ProductController extends Controller
     }
 
     public function edit(Product $product){
-        $akuns = Akun::join('kategori_akuns', 'kategori_akuns.id', '=', 'akuns.kategori_akun_id')
-        ->where('kategori_akuns.nama', 'PERSEDIAAN')
-        ->select('akuns.nama', 'akuns.id')
-        ->get();
+        $akuns = Akun::select('akuns.nama', 'akuns.id')->get();
         return view('products.edit', compact('akuns', 'product'));
     }
 
@@ -67,7 +62,6 @@ class ProductController extends Controller
             'kategori' => 'required|string',
             'harga_beli' => 'required|numeric',
             'harga' => 'required|numeric',
-            'stock' => 'required|numeric',
             'akun_persediaan' => 'required',
         ]);
 
