@@ -16,7 +16,7 @@
 </head>
 
 <body>
-    <script src="assets/static/js/initTheme.js"></script>
+    <script src="{{ asset('dist/assets/static/js/initTheme.js') }}"></script>
     <div id="app">
         <div id="sidebar">
             <div class="sidebar-wrapper active">
@@ -167,7 +167,7 @@
                     
                     <ul class="submenu ">
                         <li class="submenu-item {{ request()->is('suppliers*') ? 'active' : '' }} ">
-                            <a href="{{ route('suppliers.index') }}" class="submenu-link">Supplier</a>
+                            <a href="{{ route(name: 'suppliers.index') }}" class="submenu-link">Supplier</a>
                         </li>
                         <li class="submenu-item {{ request()->is('products*') ? 'active' : '' }} ">
                             <a href="{{ route('products.index') }}" class="submenu-link">Barang</a>

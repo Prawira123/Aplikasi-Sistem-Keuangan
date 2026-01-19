@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/karyawans/karyawanStatus/{id}', [KaryawanController::class, 'karyawanStatus'])->name('karyawans.karyawanStatus')->middleware( ['role:owner,admin']);
     
     Route::resource('transaksi_masuks', TransaksiMasukController::class)->middleware( ['role:owner,admin']);
+    Route::get('transaksi_masuk/invoice/{id}', [TransaksiMasukController::class, 'exportPDFInvoice'])->name('exportPDFInvoice')->middleware( ['role:owner,admin']);
 
     Route::resource('transaksi_keluars', TransaksiKeluarController::class)->middleware( ['role:owner,admin']);
 

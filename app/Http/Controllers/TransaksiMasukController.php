@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Models\TransaksiMasuk;
 use Illuminate\Validation\Rule;
 use App\Models\LaporanTransaksi;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TransaksiMasukController extends Controller
 {
@@ -481,6 +482,17 @@ class TransaksiMasukController extends Controller
     private function HPP(){
         $hpp = Akun::where('nama', 'HPP')->first();
         return $hpp;
+    }
+
+    public function exportPDFInvoice(Request $request, $id){
+
+        $transaksi_masuk = TransaksiMasuk::with(['karyawan', 'product', 'jasa', 'paket'])->findOrFail($id);
+        $data = compact('transaksi_masuk');
+
+        $pdf = Pdf::loadView('pdf.invoice', $data)
+        ->setPaper('A4', 'portrait');
+
+        return $pdf->download('invoice-' . $transaksi_masuk->kode . '.pdf');
     }
 
 }

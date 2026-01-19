@@ -32,6 +32,9 @@
     </div>
     <section class="section">
         <div class="card">
+            <div class="card-header d-flex justify-content-end">
+                <a href="{{ route('exportPDFInvoice', $transaksi_masuk->id) }}" class="btn btn-success">Cetak Invoice</a>
+            </div>
             <div class="card-header d-flex gap-4">
                 <h4 class="card-title">{{ $transaksi_masuk->karyawan->fullname }}</h4>
                 <p>|</p>
@@ -57,7 +60,7 @@
             </div>
             @if($transaksi_masuk->tipe == 'Barang')
                 <div class="card-body d-flex justify-content-between">
-                    <p>QTY {{ $transaksi_masuk->qty }}</p>
+                    <p>QTY : {{ $transaksi_masuk->qty }}</p>
                 </div>
                 <div class="card-body d-flex justify-content-between">
                     <p>Harga satuan : Rp. {{number_format($transaksi_masuk->harga_satuan, 2, ',', '.')}}</p>
@@ -66,7 +69,6 @@
             <div class="card-body d-flex justify-content-between">
                 <h6>Total : <span class="text-info">{{ 'Rp. ' . number_format($transaksi_masuk->harga_total, 2, ',', '.') }}</span></h6>
             </div>
-
             <div class="card-footer">
                 <a href="{{ route('transaksi_masuks.index') }}" class="btn btn-primary">Kembali</a>
             </div>

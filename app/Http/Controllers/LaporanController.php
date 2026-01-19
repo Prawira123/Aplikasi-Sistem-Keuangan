@@ -704,7 +704,6 @@ private function getDataLaporanStock($start_date, $end_date)
         ];
     }
 
-
     private function getDataPendapatan($start_date, $end_date){
         $data = [];
         $total = 0;
