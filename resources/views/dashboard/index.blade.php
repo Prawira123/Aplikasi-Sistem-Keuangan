@@ -15,7 +15,7 @@
         <div class="col-12 col-lg-9">
             <div class="row">
                 @if(session('role') == 'owner')
-                    <div class="col-6 col-lg-4 col-md-6">
+                    <div class="col-6 col-lg-3 col-md-6">
                         <a href="{{ route('transaksi_masuks.index') }}">
                             <div class="card bg-success">
                                 <div class="card-body px-4 py-4-5">
@@ -29,7 +29,7 @@
                             </div>
                         </a>
                     </div>
-                    <div class="col-6 col-lg-4 col-md-6">
+                    <div class="col-6 col-lg-3 col-md-6">
                         <a href="{{ route('transaksi_keluars.index') }}">
                             <div class="card bg-danger"> 
                                 <div class="card-body px-4 py-4-5">
@@ -43,7 +43,7 @@
                             </div>
                         </a>
                     </div>
-                    <div class="col-6 col-lg-4 col-md-6">
+                    <div class="col-6 col-lg-3 col-md-6">
                         <a href="{{ route('transaksi_keluars.index') }}">
                             <div class="card bg-warning"> 
                                 <div class="card-body px-4 py-4-5">
@@ -51,6 +51,20 @@
                                         <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-12">
                                             <h6 class=" font-semibold text-white">Total Transaksi</h6>
                                             <h6 class="font-extrabold mb-0 text-white">{{ $total_transaksi }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-lg-3 col-md-6">
+                        <a href="{{ route('transaksi_keluars.index') }}">
+                            <div class="card bg-primary"> 
+                                <div class="card-body px-4 py-4-5">
+                                    <div class="row">
+                                        <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-12">
+                                            <h6 class=" font-semibold text-white">Kas & Bank</h6>
+                                            <h6 class="font-extrabold mb-0 text-white">Rp.{{ number_format($likuiditas, 2, ',', '.') }}</h6>
                                         </div>
                                     </div>
                                 </div>

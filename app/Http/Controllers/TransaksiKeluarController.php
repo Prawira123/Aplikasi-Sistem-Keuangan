@@ -60,6 +60,15 @@ class TransaksiKeluarController extends Controller
 
         $kode = 'TK'. str_pad($nextId, 3, '0', STR_PAD_LEFT);
 
+        $akunKredit = Akun::findOrFail($request->akun_kredit_id);
+
+        if ($request->harga_total > $akunKredit->saldo_sementara) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Saldo akun '.$akunKredit->nama.' tidak mencukupi');
+        }
+
         $transaksi_keluar = TransaksiKeluar::create([
             'supplier_id' => $request->supplier_id,
             'product_id' => $request->product_id,
@@ -95,6 +104,9 @@ class TransaksiKeluarController extends Controller
         
         $this->penambahanStock($request->product_id, $request->qty); 
 
+        $this->saldo_debit_create($request->akun_debit_id, $request->harga_total);
+        $this->saldo_kredit_create($request->akun_kredit_id, $request->harga_total);
+
         if ($request->action === 'save_next') {
         return redirect()
             ->route('transaksi_keluars.create')
@@ -112,6 +124,7 @@ class TransaksiKeluarController extends Controller
         return view('transaksi_keluars.edit', compact('transaksi_keluar', 'products', 'suppliers', 'akuns'));
     }   
 
+
     public function update(Request $request, TransaksiKeluar $transaksi_keluar){
         $request->validate([
             'supplier_id' => 'required',
@@ -128,6 +141,9 @@ class TransaksiKeluarController extends Controller
         $this->penguranganStock($request->product_id, $transaksi_keluar->qty);
 
         $harga_total = $request->qty * $request->harga_satuan;
+
+        $this->updateSaldoDebit($request->akun_debit_id, $harga_total, $transaksi_keluar->id);
+        $this->updateSaldoKredit($request->akun_kredit_id, $harga_total, $transaksi_keluar->id);
 
         $transaksi_keluar->update([
             'supplier_id' => $request->supplier_id,
@@ -163,6 +179,9 @@ class TransaksiKeluarController extends Controller
 
     public function destroy(TransaksiKeluar $transaksi_keluar){
         
+        $this->saldo_debit_deleted($transaksi_keluar->id, $transaksi_keluar->akun_debit_id);
+        $this->saldo_kredit_deleted($transaksi_keluar->id, $transaksi_keluar->akun_kredit_id);
+
         $transaksi_keluar->delete();
         $this->jurnal_entry_delete($transaksi_keluar->jurnal_id);
         $this->laporan_transaksi_entry_delete($transaksi_keluar->laporan_transaksi_id);
@@ -258,5 +277,136 @@ class TransaksiKeluarController extends Controller
         JurnalDetail::where('jurnal_header_id', $id)->delete();
        
         return JurnalHeader::findOrFail($id)->delete();
+    }
+
+     public function saldo_debit_create($id, $saldo_sementara){
+        $akun = Akun::find($id); // Ganti 1 dengan ID akun yang sesuai
+
+        if($akun->normal_post == 'Debit'){
+            $saldo = $akun->saldo_sementara + $saldo_sementara;
+        } else {
+            $saldo = $akun->saldo_sementara - $saldo_sementara;
+        }
+
+       $akun->update([
+        'saldo_sementara' => $saldo,
+       ]);
+    }
+
+    public function saldo_kredit_create($id, $saldo_sementara){
+        $akun = Akun::find($id);
+
+        if($akun->normal_post == 'Kredit'){
+            $saldo = $akun->saldo_sementara + $saldo_sementara;
+        } else {
+            $saldo = $akun->saldo_sementara - $saldo_sementara;
+        }
+
+       $akun->update([
+        'saldo_sementara' => $saldo,
+       ]);
+    }
+
+    public function updateSaldoDebit($id, $nominalBaru, $transaksi_id)
+    {
+        $transaksi = TransaksiKeluar::findOrFail($transaksi_id);
+        $akun = Akun::findOrFail($id);
+
+        $akunDebitBaru = $akun->id;
+
+        if ($transaksi->akun_debit_id == $akunDebitBaru) {
+            // akun TIDAK berubah → rollback + apply
+            $this->rollbackSaldo($akunDebitBaru, $transaksi->harga_total, 'Debit');
+            $this->applySaldo($akunDebitBaru, $nominalBaru, 'Debit');
+        } else {
+            // akun BERUBAH
+            $this->rollbackSaldo($transaksi->akun_debit_id, $transaksi->harga_total, 'Debit');
+            $this->applySaldo($akunDebitBaru, $nominalBaru, 'Debit');
+        }
+    }
+
+    public function updateSaldoKredit($id, $nominalBaru, $transaksi_id)
+    {
+        $transaksi = TransaksiKeluar::findOrFail($transaksi_id);
+        $akun = Akun::findOrFail($id);
+
+        $akunKreditBaru = $akun->id;
+
+        if ($transaksi->akun_kredit_id == $akunKreditBaru) {
+            $this->rollbackSaldo($transaksi->akun_kredit_id, $transaksi->harga_total, 'Kredit');
+            $this->applySaldo($akunKreditBaru, $nominalBaru, 'Kredit');
+        } else {
+            $this->rollbackSaldo($transaksi->akun_kredit_id, $transaksi->harga_total, 'Kredit');
+            $this->applySaldo($akunKreditBaru, $nominalBaru, 'Kredit');
+        }
+    }
+    private function rollbackSaldo($akunId, $nominal, $posisi)
+    {
+        $akun = Akun::findOrFail($akunId);
+
+        if (
+            ($posisi == 'Debit' && $akun->normal_post == 'Debit') ||
+            ($posisi == 'Kredit' && $akun->normal_post == 'Kredit')
+        ) {
+            $akun->saldo_sementara -= $nominal;
+        } else {
+            $akun->saldo_sementara += $nominal;
+        }
+
+        $akun->save();
+    }
+
+    private function applySaldo($akunId, $nominal, $posisi)
+    {
+        $akun = Akun::findOrFail($akunId);
+
+        if (
+            ($posisi == 'Debit' && $akun->normal_post == 'Debit') ||
+            ($posisi == 'Kredit' && $akun->normal_post == 'Kredit')
+        ) {
+            $akun->saldo_sementara += $nominal;
+        } else {
+            $akun->saldo_sementara -= $nominal;
+        }
+
+        $akun->save();
+    }
+
+    public function saldo_debit_deleted($transaksi_id, $id){
+        $transaksi = TransaksiKeluar::findOrFail($transaksi_id);
+
+        $akun = Akun::findOrFail($id);
+
+        if($transaksi->akun_debit_id == $akun->id){
+            if($akun->normal_post == 'Debit'){
+                $saldo = $akun->saldo_sementara - $transaksi->harga_total;
+            } else {
+                $saldo = $akun->saldo_sementara + $transaksi->harga_total;
+            }
+
+           $akun->update([
+            'saldo_sementara' => $saldo,
+           ]);
+        }
+
+    }
+
+    public function saldo_kredit_deleted($transaksi_id, $id){
+        $transaksi = TransaksiKeluar::findOrFail($transaksi_id);
+
+        $akun = Akun::findOrFail($id);
+
+        if($transaksi->akun_kredit_id == $akun->id){
+            if($akun->normal_post == 'Kredit'){
+                $saldo = $akun->saldo_sementara - $transaksi->harga_total;
+            } else {
+                $saldo = $akun->saldo_sementara + $transaksi->harga_total;
+            }
+
+           $akun->update([
+            'saldo_sementara' => $saldo,
+           ]);
+        }
+
     }
 }

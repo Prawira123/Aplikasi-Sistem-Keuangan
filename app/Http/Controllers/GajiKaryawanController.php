@@ -107,6 +107,15 @@ class GajiKaryawanController extends Controller
             'total_gaji' => 'required|numeric',
         ]);
 
+        $akunKredit = Akun::findOrFail($request->akun_kredit);
+
+        if ($request->total_gaji > $akunKredit->saldo_sementara) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Saldo akun '.$akunKredit->nama.' tidak mencukupi');
+        }
+
         $this->jurnal_entry($request->tanggal, 'Pembayaran Gaji Karyawan tanggal '.\Carbon\Carbon::parse($request->tanggal)->format('d F Y'), [
             [
                 'akun_id' => $request->akun_debit,

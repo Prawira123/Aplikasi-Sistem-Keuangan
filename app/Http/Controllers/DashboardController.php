@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Akun;
 use App\Models\Jasa;
 use App\Models\User;
 use App\Models\Paket;
@@ -23,13 +24,14 @@ class DashboardController extends Controller
         $banyak_penjualan = TransaksiMasuk::count();
         $banyak_pembelian = TransaksiKeluar::count();
         $total_transaksi = $banyak_penjualan + $banyak_pembelian;
-        $likuiditas = $this->getDataLikuiditas();
         $pembelian = $this->getDataPembelian();
         $user = Auth::user();
         $products = Product::count();
         $jasas = Jasa::count();
         $pakets = Paket::count();
         $pelanggans = $this->getDataPelanggan();
+        $likuiditas = $this->likuiditas();
+        
         return view('dashboard.index', compact('transaksi_masuks', 'transaksi_keluars', 'products', 'jasas', 'pakets', 'pelanggans', 'likuiditas', 'user', 'pembelian', 'total_transaksi'));
     }
 
@@ -130,5 +132,15 @@ class DashboardController extends Controller
         ->orderByDesc('transaksi_count')
         ->paginate(5);
     }
+
+    private function likuiditas(){
+        $kas = Akun::where('nama', 'KAS')->value('saldo_sementara');
+        $akun_bank = Akun::where('nama', 'like', '%BANK%')->value('saldo_sementara');
+
+        $likuiditas = $kas + $akun_bank;
+
+        return $likuiditas;
+    }
+
 
 }

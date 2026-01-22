@@ -38,7 +38,6 @@
                 </h5>
             </div>
             <div class="card-body">
-
                 <form action="{{ route('transaksi_masuks.store') }}" method="post">
                     @csrf
                     <div class="card">

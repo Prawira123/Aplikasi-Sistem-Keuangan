@@ -90,6 +90,14 @@ class JurnalEntryController extends Controller
             }   
         }
 
+        if ($request->akun_debit_id) {
+            $this->applySaldo($request->akun_debit_id, $request->nominal, 'Debit');
+        }
+
+        if ($request->akun_kredit_id) {
+            $this->applySaldo($request->akun_kredit_id, $request->nominal, 'Kredit');
+        }
+
         if ($request->action === 'save_next') {
             return redirect()
             ->route('jurnal_entries.create')
@@ -122,7 +130,27 @@ class JurnalEntryController extends Controller
             'keterangan' => $request->keterangan,
         ]);
 
+        $jurnalLama = JurnalDetail::where('jurnal_header_id', $jurnal_header->id)->get();
+
+        foreach ($jurnalLama as $detail) {
+            if ($detail->nominal_debit > 0) {
+                $this->rollbackSaldo($detail->akun_id, $detail->nominal_debit, 'Debit');
+            }
+
+            if ($detail->nominal_kredit > 0) {
+                $this->rollbackSaldo($detail->akun_id, $detail->nominal_kredit, 'Kredit');
+            }
+        }
+
         JurnalDetail::where('jurnal_header_id', $jurnal_header->id)->delete();
+
+        if ($request->akun_debit_id) {
+            $this->applySaldo($request->akun_debit_id, $request->nominal, 'Debit');
+        }
+
+        if ($request->akun_kredit_id) {
+            $this->applySaldo($request->akun_kredit_id, $request->nominal, 'Kredit');
+        }
 
         if($request->akun_debit_id && $request->akun_kredit_id){
             $items = [
@@ -169,11 +197,50 @@ class JurnalEntryController extends Controller
 
     public function destroy($id){
 
+        $jurnalDetails = JurnalDetail::where('jurnal_header_id', $id)->get();
+
+        foreach ($jurnalDetails as $detail) {
+            if ($detail->nominal_debit > 0) {
+                $this->rollbackSaldo($detail->akun_id, $detail->nominal_debit, 'Debit');
+            }
+
+            if ($detail->nominal_kredit > 0) {
+                $this->rollbackSaldo($detail->akun_id, $detail->nominal_kredit, 'Kredit');
+            }
+        }
+
         $jurnal_header = JurnalHeader::findOrFail($id);
         JurnalDetail::where('jurnal_header_id', $jurnal_header->id)->delete();
         $jurnal_header->delete();
 
         return redirect()->route('jurnal_entries.index')->with('success', 'jurnal entry deleted successfully');
+    }
+
+    private function rollbackSaldo($akunId, $nominal, $posisi)
+    {
+        $akun = Akun::findOrFail($akunId);
+
+        if ($akun->normal_post === $posisi) {
+            $akun->saldo_sementara -= $nominal;
+        } else {
+            $akun->saldo_sementara += $nominal;
+        }
+
+        $akun->save();
+    }
+
+
+    private function applySaldo($akunId, $nominal, $posisi)
+    {
+        $akun = Akun::findOrFail($akunId);
+
+        if ($akun->normal_post === $posisi) {
+            $akun->saldo_sementara += $nominal;
+        } else {
+            $akun->saldo_sementara -= $nominal;
+        }
+
+        $akun->save();
     }
 
 

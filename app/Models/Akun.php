@@ -22,6 +22,7 @@ class Akun extends Model
         'lawan_post',
         'jurnal_id',
         'aktivitas_kas',
+        'saldo_sementara',
     ];
 
     public function kategori_akun()

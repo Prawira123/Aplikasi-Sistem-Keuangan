@@ -41,6 +41,12 @@ class AkunController extends Controller
 
         $kode = $this->kodeAkun($request->kategori_akun_id);
         $kelompok_id = KategoriAkun::where('id', $request->kategori_akun_id)->value('kelompok_id');
+
+        $saldo_sementara = 0;
+
+        if($request->saldo_awal > 0){
+            $saldo_sementara = $request->saldo_awal;
+        }
         
         $akun = Akun::create([
             'kode' => $kode,
@@ -51,6 +57,7 @@ class AkunController extends Controller
             'kategori_akun_id' => $request->kategori_akun_id,
             'aktivitas_kas' => $request->aktivitas_kas,
             'saldo_awal' => $request->saldo_awal ? $request->saldo_awal : 0,
+            'saldo_sementara' => $saldo_sementara,
         ]);
 
         // if($akun->saldo_awal > 0 && $akun->normal_post == 'Debit'){
@@ -117,7 +124,12 @@ class AkunController extends Controller
         ]);
         
         $kode = $this->kodeAkun($request->kategori_akun_id);
-        $kelompok_id = KategoriAkun::where('id', $request->kategori_akun_id)->value('kelompok_id');
+        $kelompok_id = KategoriAkun::where('id', $request->kategori_akun_id)->value('kelompok_id'); 
+
+        $saldo_sementara = 0;
+        if($request->saldo_awal > 0){
+            $saldo_sementara = $request->saldo_awal + $akun->saldo_sementara;
+        }
 
         $akun->update([
             // 'kode' => $kode,
@@ -128,6 +140,7 @@ class AkunController extends Controller
             'aktivitas_kas' => $request->aktivitas_kas ?? null,
             'kategori_akun_id' => $request->kategori_akun_id,
             'saldo_awal' => $request->saldo_awal,
+            'saldo_sementara' => $saldo_sementara,
         ]);
 
 

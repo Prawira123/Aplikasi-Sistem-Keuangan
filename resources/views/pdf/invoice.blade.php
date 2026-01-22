@@ -159,7 +159,7 @@
                 <td class="text-right">{{ number_format($subtotal, 2, ',', '.') }}</td>
             </tr>
         @endif
-
+        
         @if($transaksi_masuk->paket)
             @php
                 $subtotal = $transaksi_masuk->harga_total;

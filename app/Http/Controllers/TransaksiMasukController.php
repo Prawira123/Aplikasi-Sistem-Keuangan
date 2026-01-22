@@ -164,6 +164,9 @@ class TransaksiMasukController extends Controller
             'laporan_transaksi_id' => $laporan->id
         ]);
 
+        $this->saldo_debit_create($request->akun_debit_id, $request->harga_total);
+        $this->saldo_kredit_create($request->akun_kredit_id, $request->harga_total);
+
         if ($request->action === 'save_next') {
         return redirect()
             ->route('transaksi_masuks.create')
@@ -214,6 +217,9 @@ class TransaksiMasukController extends Controller
         } else {
             $harga_total = $request->harga_total;
         }
+
+        $this->updateSaldoDebit($request->akun_debit_id, $request->harga_total, $transaksi_masuk->id);
+        $this->updateSaldoKredit($request->akun_kredit_id, $request->harga_total, $transaksi_masuk->id);
 
         $transaksi_masuk->update([
             'product_id' => $request->product_id,
@@ -308,7 +314,12 @@ class TransaksiMasukController extends Controller
     public function destroy($id){
 
         $transaksi_masuk = TransaksiMasuk::findOrFail($id);
+
+        $this->saldo_debit_deleted($id, $transaksi_masuk->akun_debit_id);
+        $this->saldo_kredit_deleted($id, $transaksi_masuk->akun_kredit_id);
+
         $transaksi_masuk->delete();
+
         if($transaksi_masuk->jurnal_id){
             $this->jurnal_entry_delete($transaksi_masuk->jurnal_id);            
         }
@@ -316,6 +327,7 @@ class TransaksiMasukController extends Controller
             $this->laporan_transaksi_entry_delete($transaksi_masuk->laporan_transaksi_id);
         }
         $this->restoreStock($transaksi_masuk);
+
 
         return redirect()->route('transaksi_masuks.index')->with('success', 'transaksi_masuks deleted successfully');
     }
@@ -494,5 +506,139 @@ class TransaksiMasukController extends Controller
 
         return $pdf->download('invoice-' . $transaksi_masuk->kode . '.pdf');
     }
+
+    public function saldo_debit_create($id, $saldo_sementara){
+        $akun = Akun::find($id); // Ganti 1 dengan ID akun yang sesuai
+
+        if($akun->normal_post == 'Debit'){
+            $saldo = $akun->saldo_sementara + $saldo_sementara;
+        } else {
+            $saldo = $akun->saldo_sementara - $saldo_sementara;
+        }
+
+       $akun->update([
+        'saldo_sementara' => $saldo,
+       ]);
+    }
+
+    public function saldo_kredit_create($id, $saldo_sementara){
+        $akun = Akun::find($id);
+
+        if($akun->normal_post == 'Kredit'){
+            $saldo = $akun->saldo_sementara + $saldo_sementara;
+        } else {
+            $saldo = $akun->saldo_sementara - $saldo_sementara;
+        }
+
+       $akun->update([
+        'saldo_sementara' => $saldo,
+       ]);
+    }
+
+
+   public function updateSaldoDebit($id, $nominalBaru, $transaksi_id)
+    {
+        $transaksi = TransaksiMasuk::findOrFail($transaksi_id);
+        $akun = Akun::findOrFail($id);
+
+        $akunDebitBaru = $akun->id;
+
+        if ($transaksi->akun_debit_id == $akunDebitBaru) {
+            // akun TIDAK berubah → rollback + apply
+            $this->rollbackSaldo($akunDebitBaru, $transaksi->harga_total, 'Debit');
+            $this->applySaldo($akunDebitBaru, $nominalBaru, 'Debit');
+        } else {
+            // akun BERUBAH
+            $this->rollbackSaldo($transaksi->akun_debit_id, $transaksi->harga_total, 'Debit');
+            $this->applySaldo($akunDebitBaru, $nominalBaru, 'Debit');
+        }
+    }
+
+    public function updateSaldoKredit($id, $nominalBaru, $transaksi_id)
+    {
+        $transaksi = TransaksiMasuk::findOrFail($transaksi_id);
+        $akun = Akun::findOrFail($id);
+
+        $akunKreditBaru = $akun->id;
+
+        if ($transaksi->akun_kredit_id == $akunKreditBaru) {
+            $this->rollbackSaldo($transaksi->akun_kredit_id, $transaksi->harga_total, 'Kredit');
+            $this->applySaldo($akunKreditBaru, $nominalBaru, 'Kredit');
+        } else {
+            $this->rollbackSaldo($transaksi->akun_kredit_id, $transaksi->harga_total, 'Kredit');
+            $this->applySaldo($akunKreditBaru, $nominalBaru, 'Kredit');
+        }
+    }
+    private function rollbackSaldo($akunId, $nominal, $posisi)
+    {
+        $akun = Akun::findOrFail($akunId);
+
+        if (
+            ($posisi == 'Debit' && $akun->normal_post == 'Debit') ||
+            ($posisi == 'Kredit' && $akun->normal_post == 'Kredit')
+        ) {
+            $akun->saldo_sementara -= $nominal;
+        } else {
+            $akun->saldo_sementara += $nominal;
+        }
+
+        $akun->save();
+    }
+
+    private function applySaldo($akunId, $nominal, $posisi)
+    {
+        $akun = Akun::findOrFail($akunId);
+
+        if (
+            ($posisi == 'Debit' && $akun->normal_post == 'Debit') ||
+            ($posisi == 'Kredit' && $akun->normal_post == 'Kredit')
+        ) {
+            $akun->saldo_sementara += $nominal;
+        } else {
+            $akun->saldo_sementara -= $nominal;
+        }
+
+        $akun->save();
+    }
+
+    public function saldo_debit_deleted($transaksi_id, $id){
+        $transaksi = TransaksiMasuk::findOrFail($transaksi_id);
+
+        $akun = Akun::findOrFail($id);
+
+        if($transaksi->akun_debit_id == $akun->id){
+            if($akun->normal_post == 'Debit'){
+                $saldo = $akun->saldo_sementara - $transaksi->harga_total;
+            } else {
+                $saldo = $akun->saldo_sementara + $transaksi->harga_total;
+            }
+
+           $akun->update([
+            'saldo_sementara' => $saldo,
+           ]);
+        }
+
+    }
+
+    public function saldo_kredit_deleted($transaksi_id, $id){
+        $transaksi = TransaksiMasuk::findOrFail($transaksi_id);
+
+        $akun = Akun::findOrFail($id);
+
+        if($transaksi->akun_kredit_id == $akun->id){
+            if($akun->normal_post == 'Kredit'){
+                $saldo = $akun->saldo_sementara - $transaksi->harga_total;
+            } else {
+                $saldo = $akun->saldo_sementara + $transaksi->harga_total;
+            }
+
+           $akun->update([
+            'saldo_sementara' => $saldo,
+           ]);
+        }
+
+    }
+
+
 
 }
