@@ -30,9 +30,10 @@ class DashboardController extends Controller
         $jasas = Jasa::count();
         $pakets = Paket::count();
         $pelanggans = $this->getDataPelanggan();
-        $likuiditas = $this->likuiditas();
+        $kas = $this->kas();
+        $bank = $this->bank();
         
-        return view('dashboard.index', compact('transaksi_masuks', 'transaksi_keluars', 'products', 'jasas', 'pakets', 'pelanggans', 'likuiditas', 'user', 'pembelian', 'total_transaksi'));
+        return view('dashboard.index', compact('transaksi_masuks', 'transaksi_keluars', 'products', 'jasas', 'pakets', 'pelanggans', 'kas', 'bank', 'user', 'pembelian', 'total_transaksi'));
     }
 
 
@@ -133,13 +134,16 @@ class DashboardController extends Controller
         ->paginate(5);
     }
 
-    private function likuiditas(){
+    private function kas(){
         $kas = Akun::where('nama', 'KAS')->value('saldo_sementara');
+
+        return $kas;
+    }
+
+    private function bank(){
         $akun_bank = Akun::where('nama', 'like', '%BANK%')->value('saldo_sementara');
 
-        $likuiditas = $kas + $akun_bank;
-
-        return $likuiditas;
+        return $akun_bank;
     }
 
 

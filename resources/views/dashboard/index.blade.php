@@ -49,8 +49,8 @@
                                 <div class="card-body px-4 py-4-5">
                                     <div class="row">
                                         <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-12">
-                                            <h6 class=" font-semibold text-white">Total Transaksi</h6>
-                                            <h6 class="font-extrabold mb-0 text-white">{{ $total_transaksi }}</h6>
+                                            <h6 class=" font-semibold text-white">Kas</h6>
+                                            <h6 class="font-extrabold mb-0 text-white">Rp.{{ number_format($kas, 2, ',', '.') }}</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -63,8 +63,8 @@
                                 <div class="card-body px-4 py-4-5">
                                     <div class="row">
                                         <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-12">
-                                            <h6 class=" font-semibold text-white">Kas & Bank</h6>
-                                            <h6 class="font-extrabold mb-0 text-white">Rp.{{ number_format($likuiditas, 2, ',', '.') }}</h6>
+                                            <h6 class=" font-semibold text-white">Bank BCA</h6>
+                                            <h6 class="font-extrabold mb-0 text-white">Rp.{{ number_format($bank, 2, ',', '.') }}</h6>
                                         </div>
                                     </div>
                                 </div>
